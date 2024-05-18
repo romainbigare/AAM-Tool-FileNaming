@@ -1,6 +1,3 @@
-![icon](https://github.com/romainbigare/AAM-Tool-FileNaming/assets/132197329/1268cca3-aa5c-479f-a03f-0ab5e69f88e5)
-
-
 ## Tool for the naming of files at Allies and Morrison
 
 This tool adds a right click option on your computer, to open a folder's content and rename all the files inside of it based on ISO or other standards.
