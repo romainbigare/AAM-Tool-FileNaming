@@ -1,17 +1,15 @@
-﻿using System;
+﻿using AAMFileNamingCore.Util;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using System.Windows.Controls;
 using System.Windows.Media;
-using static System.Windows.Forms.Design.AxImporter;
 
-namespace AAMFileNaming
+namespace AAMFileNamingCore.DataModel
 {
     public class File : INotifyPropertyChanged
     {
@@ -19,6 +17,7 @@ namespace AAMFileNaming
         // proj number _ file code _  document type _  date of issue _ rev _ descriptiion
         // volume / building	-	level	-	type	-	role	-	type code	drawing serial no.	_	short description (optional)
 
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public string Name => System.IO.Path.GetFileNameWithoutExtension(Path);
         public string Path { get; set; }
         public string Extension => System.IO.Path.GetExtension(Path);
@@ -33,7 +32,8 @@ namespace AAMFileNaming
         }
 
         public string NewNameNonIso => $"{ProjectNumber}_{FileCodeString}{CreateSeparator(DocumentTypeString, "_")}{DocumentTypeString}_{DateOfIssue}{CreateSeparator(Revision, "_")}{Revision}{CreateSeparator(Description, "_")}{Description}";
-
+        public string NewNameRootIso => $"{ProjectNumber}-{Originator}-{Volume}-{LevelString}-{DocumentTypeString}-{RoleString}-{TypeCodeString}-{Description}";
+        public string NewNameRootNonIso => $"{ProjectNumber}_{FileCodeString}_{DocumentTypeString}_{DateOfIssue}_{Revision}_{Description}";
         #region Properties
 
         private string _projectNumber = "";
@@ -49,7 +49,18 @@ namespace AAMFileNaming
 
         private string _description = "";
         public string Description { get => _description; set => _description = value; }
+        // description naked is the description without any ( digit ) at the end
+        public string DescriptionNaked => Regex.Replace(Description, @"\(\d+\)$", "");
 
+        // description number is the number at the end of the description , in parenthesis
+        public string DescriptionNumber
+        {
+            get
+            {
+                var match = Regex.Match(Description, @"\((\d+)\)$");
+                return match.Success ? match.Groups[1].Value : "";
+            }
+        }
 
         private string _revision = "";
         public string Revision { get => _revision; set => _revision = value; }
@@ -57,22 +68,22 @@ namespace AAMFileNaming
 
         private Level _level = Level.NoLevelApplicable;
         public Level Level { get => _level; set => _level = value; }
-        public string LevelString => NamingLists.GetAbbreviation(Level) ?? String.Empty;
+        public string LevelString => NamingLists.GetAbbreviation(Level) ?? string.Empty;
 
 
         private DocumentType _documentType = DocumentType.None;
         public DocumentType DocumentType { get => _documentType; set => _documentType = value; }
-        public string DocumentTypeString => NamingLists.GetAbbreviation(DocumentType) ?? String.Empty;
+        public string DocumentTypeString => NamingLists.GetAbbreviation(DocumentType) ?? string.Empty;
 
 
         private Role _role = Role.Architecture;
         public Role Role { get => _role; set => _role = value; }
-        public string RoleString => NamingLists.GetAbbreviation(Role) ?? String.Empty;
+        public string RoleString => NamingLists.GetAbbreviation(Role) ?? string.Empty;
 
 
-        private TypeCode _typeCode = AAMFileNaming.TypeCode.None;
+        private TypeCode _typeCode = TypeCode.None;
         public TypeCode TypeCode { get => _typeCode; set => _typeCode = value; }
-        public string TypeCodeString => NamingLists.GetAbbreviation(TypeCode) ?? String.Empty;
+        public string TypeCodeString => NamingLists.GetAbbreviation(TypeCode) ?? string.Empty;
 
 
         private string _drawingSerialNo = "";
@@ -85,22 +96,24 @@ namespace AAMFileNaming
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs("DrawingSerialNo"));
             }
         }
+        public int DrawingSerialNoInt => int.TryParse(DrawingSerialNo, out int result) ? result : 0;
+
 
         private string _dateOfIssue = "";
         public string DateOfIssue { get => _dateOfIssue; set => _dateOfIssue = value; }
 
         private FileCode _fileCode = FileCode.None;
-        public FileCode FileCode { get => _fileCode; set => _fileCode = value;}
-       
-        public string FileCodeString => NamingLists.GetAbbreviation(FileCode) ?? String.Empty;
+        public FileCode FileCode { get => _fileCode; set => _fileCode = value; }
+
+        public string FileCodeString => NamingLists.GetAbbreviation(FileCode) ?? string.Empty;
 
 
         private FileType _fileType = FileType.None;
-        public FileType FileType { get => _fileType; set => _fileType = value;}
-       
-        public string FileTypeString => NamingLists.GetAbbreviation(FileType) ?? String.Empty;
+        public FileType FileType { get => _fileType; set => _fileType = value; }
+
+        public string FileTypeString => NamingLists.GetAbbreviation(FileType) ?? string.Empty;
         public Brush IndicatorColor => (Brush)new BrushConverter().ConvertFromString(ColorUtil.ExtensionToHex(Extension.ToLower()));
-        
+
         #endregion
         public File(string path)
         {
@@ -120,7 +133,7 @@ namespace AAMFileNaming
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e); 
+                    Console.WriteLine(e);
                 }
 
             else if (nonIsoFormatApplied)
@@ -172,8 +185,10 @@ namespace AAMFileNaming
         {
         }
 
-        public void Save()
+        public void Save(bool iso)
         {
+            string nameToSave = iso ? NewNameIso : NewNameNonIso;
+            Logger.Info($"Saving file name, old name {Name}, new name : {nameToSave}, path : {Path}");
         }
 
         public void UpdateValue(Type type, object value)
@@ -219,6 +234,57 @@ namespace AAMFileNaming
         private PropertyInfo GetPropertyFromName(string name)
         {
             return GetType().GetProperty(name);
+        }
+
+        internal void EnsureUniqueness(ICollection<File> selectedFiles, bool iso)
+        {
+            if (iso)
+            {
+                EnsureIsoUniqueness(selectedFiles);
+            }
+            else
+            {
+                EnsureNonIsoUniqueness(selectedFiles);
+            }
+        }
+
+        private void EnsureNonIsoUniqueness(ICollection<File> selectedFiles)
+        {
+            var sameRoot = selectedFiles.Where(f => f.NewNameNonIso == NewNameNonIso);
+            if (sameRoot == null || sameRoot.Count() < 2)
+                return;
+
+            sameRoot = sameRoot.Where(f => f != this);
+            Description = FindNextAvailableDescription(sameRoot);
+            OnPropertyChanged(nameof(Description));
+        }
+
+        private string FindNextAvailableDescription(IEnumerable<File> sameRoot)
+        {
+            var descriptions = sameRoot.Select(f => f.DescriptionNaked).ToList();
+            var max = sameRoot.Max(f => f.DescriptionNumber);
+            return $"{DescriptionNaked} ({max + 1})";
+        }
+
+        private void EnsureIsoUniqueness(ICollection<File> selectedFiles)
+        {
+            var sameRoot = selectedFiles.Where(f => f.NewNameIso == NewNameIso);
+            if (sameRoot == null || sameRoot.Count() < 2)
+                return;
+            sameRoot = sameRoot.Where(f => f != this);
+            DrawingSerialNo = FindNextAvailableSerial(sameRoot);
+            OnPropertyChanged(nameof(DrawingSerialNo));
+        }
+
+        private string FindNextAvailableSerial(IEnumerable<File> sameRoot)
+        {
+            var serials = sameRoot.Select(f => f.DrawingSerialNoInt).ToList();
+            var max = serials.Max() + 1;
+            var zeros = 4 - max.ToString().Length;
+            if (zeros > 0)
+                return max.ToString().PadLeft(zeros, '0');
+
+            return max.ToString();
         }
     }
 }

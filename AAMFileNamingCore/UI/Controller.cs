@@ -1,25 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.Design;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using AAMFileNamingCore.DataModel;
 
-namespace AAMFileNaming
+namespace AAMFileNamingCore.UI
 {
     public class Controller : INotifyPropertyChanged
     {
-        public Folder Folder { get; set; } 
+        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
+        public Folder Folder { get; set; }
         public MainWindow UI { get; set; }
 
-        public string NoFilesWarning => Folder.Path ==null || Folder.Path == "No path selected" ? "No folder selected" : IncludeSubfolders() == false ? "No files found. \nInclude subfolders to see more." : "No files found in folder or subfolders." ;
+        public string NoFilesWarning => Folder.Path == null || Folder.Path == "No path selected" ? "No folder selected" : IncludeSubfolders() == false ? "No files found. \nInclude subfolders to see more." : "No files found in folder or subfolders.";
 
-        public Controller(MainWindow ui)
+        public Controller(MainWindow ui, string folderPath)
         {
             UI = ui;
-            InitFolder();
+            InitFolder(folderPath);
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -29,16 +32,19 @@ namespace AAMFileNaming
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void InitFolder()
+        public void InitFolder(string folderPath)
         {
+            Logger.Info("Initializing folder");
             Folder = new Folder(UI.Dispatcher);
+            if (folderPath != null)
+                SetFolder(folderPath, false, null);
         }
 
         public async void UpdateProgress(double progress)
         {
-            UI.Dispatcher.Invoke(() => 
+            UI.Dispatcher.Invoke(() =>
             {
-                UI.ProgressBar.Value  = progress;
+                UI.ProgressBar.Value = progress;
             });
         }
 
@@ -55,7 +61,7 @@ namespace AAMFileNaming
 
         private async Task ProgressButtonComplete()
         {
-            if(Folder?.Files?.Count > 0)
+            if (Folder?.Files?.Count > 0)
             {
                 UI.Dispatcher.Invoke(() =>
                 {
@@ -86,36 +92,31 @@ namespace AAMFileNaming
                     UI.ProgressBarGrid.Visibility = Visibility.Collapsed;
                 });
             }
-           
+
         }
 
         public async void SetFolder(string? path, bool subfolders, List<string> filters = null)
         {
-            RefreshUILayout(isLoading:true);
+            Logger.Info($"Setting folder to {path}, include subfolders : {subfolders}");
+            RefreshUILayout(isLoading: true);
             ProgressButtonInit();
             await Task.Delay(100);
 
             try
             {
                 if (path != null)
-                    await Task.Run(() => Folder.ChangeTarget(path,subfolders, filters, UpdateProgress));
+                    await Task.Run(() => Folder.ChangeTarget(path, subfolders, filters, UpdateProgress));
             }
             catch (Exception ex)
             {
-                System.Windows.MessageBox.Show(ex.Message);
+                MessageBox.Show(ex.Message);
+                Logger.Error(ex, "Error while setting folder");
             }
 
+            Logger.Info($"Folder set to {path}");
             await ProgressButtonComplete();
             RefreshUILayout(isLoading: false);
             return;
-        }            
-
-        public void RenameFiles()
-        {
-            foreach (var file in Folder.Files)
-            {
-                file.Save();
-            }
         }
 
         internal void BrowseToFile()
@@ -142,7 +143,7 @@ namespace AAMFileNaming
             {
                 // TO DO : Save the data to the controller
                 var selectedFiles = GetGridSelection();
-                Task.Run(() => SaveToSelected(input, dataInput.SelectedItem, selectedFiles));
+                Task.Run(() => SaveToSelected(input, dataInput.SelectedItem, selectedFiles?.ToList()));
             }
         }
 
@@ -154,17 +155,18 @@ namespace AAMFileNaming
             }
         }
 
-        private List<File> GetGridSelection()
+        private ICollection<File> GetGridSelection()
         {
-            if(GetCurrentPage().ToLower().Contains("19650"))
+            if (GetCurrentPage().ToLower().Contains("19650"))
             {
-                var sel =  UI.DatagridIso.SelectedItems;
+                var sel = UI.DatagridIso.SelectedItems;
                 try
                 {
                     return sel.Cast<File>().ToList();
                 }
                 catch (Exception ex)
                 {
+                    Logger.Error(ex, "Error while getting selected files");
                     return new List<File>();
                 }
             }
@@ -177,6 +179,7 @@ namespace AAMFileNaming
                 }
                 catch (Exception ex)
                 {
+                    Logger.Error(ex, "Error while getting selected files");
                     return new List<File>();
                 }
             }
@@ -197,10 +200,10 @@ namespace AAMFileNaming
 
         internal bool ValidateInput(string text, string tagString)
         {
-            if(tagString == "Volume")
-                return text.Length == 2;
+            if (tagString == "Volume")
+                return text.Length == 1 || text.Length == 2;
 
-            if(tagString == "DrawingSerialNo")
+            if (tagString == "DrawingSerialNo")
                 return text.Length == 3;
 
             else
@@ -211,26 +214,78 @@ namespace AAMFileNaming
         {
             // find all selected row in current datagrid
             var selectedFiles = GetGridSelection();
+            var prop = textBox?.Tag?.ToString();
 
-            if (selectedFiles.Count == 0)
+            if (selectedFiles.Count == 0 || prop == null)
                 return;
+
+            if (prop.Contains("Serial"))
+            {
+                // convert text to int
+                if (!int.TryParse(text, out int digit))
+                    return;
+
+                foreach (var file in selectedFiles)
+                {
+                    file.UpdateValue(prop, digit.ToString("D3"));
+                    digit++;
+                }
+
+                return;
+            }
 
             foreach (var file in selectedFiles)
             {
-                file.UpdateValue(textBox?.Tag?.ToString(), text);
+                file.UpdateValue(prop, text);
             }
+        }
+
+
+        public async Task EnsureUniqueness(ICollection<File> selectedFiles = null)
+        {
+            // if selected files is not passed, get all files in the current folder
+            if (selectedFiles == null)
+                selectedFiles = GetGridSelection();
+
+            bool iso = GetCurrentPage().ToLower().Contains("19650");
+            try
+            {
+                foreach (var file in selectedFiles)
+                {
+                    file.EnsureUniqueness(Folder.Files, iso);
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error while ensuring uniqueness");
+                MessageBox.Show(ex.Message);
+            }
+
+
         }
 
         internal void Save()
         {
-            var s = GetGridSelection();
-            var file = s.FirstOrDefault();
-            if (file == null)
+            var selection = GetGridSelection();
+            bool iso = GetCurrentPage().Contains("19650");
+
+            if (selection == null)
+            {
+                Logger.Info("No files selected");
+                MessageBox.Show("No files selected");
                 return;
+            }
+
+            foreach (var file in selection)
+            {
+                file.Save(iso);
+            }
+
+            Logger.Info($"{selection.Count} files renamed, in path {Folder.Path}");
 
             // TO DO : CHECK UNIQUENESS OF FILENAMES
             // TO DO : IMPLEMENT SAVE
-
+            // something 
             MessageBox.Show("disabled for testing");
         }
 
@@ -268,7 +323,7 @@ namespace AAMFileNaming
             }
         }
 
-        internal async void RefreshUILayout( bool isLoading)
+        internal async void RefreshUILayout(bool isLoading)
         {
             OnPropertyChanged("NoFilesWarning");
             await UI.Dispatcher.Invoke(async () =>

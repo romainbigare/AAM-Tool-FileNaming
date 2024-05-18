@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace AAMFileNaming
+namespace AAMFileNamingCore.DataModel
 {
     internal static class Guesser
     {
@@ -123,7 +123,7 @@ namespace AAMFileNaming
             return FileType.None;
         }
 
-        public static async Task<(string Description, string Volume, Level Level)> GuessDocumentContent(string Name, string Extension )
+        public static async Task<(string Description, string Volume, Level Level)> GuessDocumentContent(string Name, string Extension)
         {
             // TO DO: Implement this method
             return ("", GuessVolume(Name), GuessLevel(Name, Extension));
@@ -202,7 +202,7 @@ namespace AAMFileNaming
                 volumeNumber = volumeNumber.Trim().Replace(" ", "").Replace("_", "").Replace("-", "");
                 // if the volume number is not empty, return it
                 if (volumeNumber.Length < 5 && volumeNumber.Length > 0 && !discardedValues.Contains(volumeNumber.ToLower()))
-                    return volumeNumber.Length <2 && char.IsDigit(volumeNumber[0]) ? "0"+ volumeNumber.ToUpper() : volumeNumber.ToUpper();
+                    return volumeNumber.Length < 2 && char.IsDigit(volumeNumber[0]) ? "0" + volumeNumber.ToUpper() : volumeNumber.ToUpper();
             }
 
             return "XX";
@@ -708,7 +708,7 @@ namespace AAMFileNaming
                 return FileCode.DocumentForInternalCirculation;
             }
 
-            return FileCode.None;
+            return FileCode.Sketch;
         }
 
         public static async Task<string> GuessDrawingSerialNo()
@@ -735,7 +735,7 @@ namespace AAMFileNaming
             if (fromContent != TypeCode.None)
                 return fromContent;
 
-            return TypeCode.None;
+            return TypeCode.Sketches;
         }
 
         public static async Task<TypeCode> GuessTypeCodeFromExtension(string Extension)

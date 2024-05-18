@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Media;
+﻿using System.Collections.Generic;
 
-namespace AAMFileNaming
+namespace AAMFileNamingCore.Util
 {
     internal static class ColorUtil
     {

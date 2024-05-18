@@ -1,32 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using AAMFileNamingCore.DataModel;
+using AAMFileNamingCore.Util;
 
-namespace AAMFileNaming
+namespace AAMFileNamingCore.UI
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        public Controller Controller { get; set; } 
-        public DebounceHelper Debouncer { get; set; } = new DebounceHelper(300);
+        public Controller Controller { get; set; }
+        public DebounceHelper Debouncer { get; set; } = new DebounceHelper(100);
 
-        public MainWindow()
+        public MainWindow(string folderPath)
         {
             InitializeComponent();
-            Controller = new Controller(this);
+            Controller = new Controller(this, folderPath);
             DataContext = this;
             ToolTipService.SetInitialShowDelay(this, 200); // Adjust as needed
         }
@@ -53,15 +45,15 @@ namespace AAMFileNaming
             // TO DO : DATA INPUT WINDOW SHOW 
             // Volume, Level, DocumentType, Role, TypeCode
             var button = sender as Button;
-            if(button == null)
+            if (button == null)
                 return;
             var tag = button.Tag;
-            if(tag == null)
+            if (tag == null)
                 return;
 
             var input = tag.ToString();
             var type = NamingLists.GetType(input);
-            if(type == null)
+            if (type == null)
             {
                 MessageBox.Show("Error: Type not found.");
                 return;
@@ -75,59 +67,84 @@ namespace AAMFileNaming
             Controller?.Save();
         }
 
+        private void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+            if (textBox == null)
+                return;
+
+            Debouncer.Debounce(() =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    var tag = textBox.Tag;
+                    var text = textBox.Text;
+                    if (tag != null && tag is string tagString)
+                    {
+                        bool? ok = Controller?.ValidateInput(text, tagString);
+
+                        if (ok.HasValue && ok.Value == false)
+                        {
+                            textBox.BorderBrush = new LinearGradientBrush()
+                            {
+                                GradientStops = new GradientStopCollection()
+                                    {
+                                        new GradientStop(Colors.IndianRed, 0),
+                                        new GradientStop(Colors.IndianRed, 1)
+                                    }
+                            };
+                        }
+                        else
+                        {
+                            // reset border
+                            textBox.BorderBrush = new LinearGradientBrush()
+                            {
+                                GradientStops = new GradientStopCollection()
+                                    {
+                                        new GradientStop(Colors.LightGray, 0),
+                                        new GradientStop(Colors.LightGray, 1)
+                                    }
+                            };
+
+                            Controller?.ApplyInput(text, textBox);
+                        }
+                    }
+                });
+            });
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            var textBox = sender as TextBox;
+
+            if (textBox != null)
+            {
+                textBox.TextChanged += TextBox_TextChanged;
+            }
+        }
+
         private void TextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             var textBox = sender as TextBox;
 
             if (textBox != null)
             {
-                Debouncer.Debounce(() =>
+                try
                 {
-                    this.Dispatcher.Invoke(() =>
-                    {
-                        var tag = textBox.Tag;
-                        var text = textBox.Text;
-                        if (tag != null && tag is string tagString)
-                        {
-                            bool? ok = Controller?.ValidateInput(text, tagString);
-                            
-                            if (ok.HasValue && ok.Value == false)
-                            {
-                                textBox.BorderBrush = new LinearGradientBrush()
-                                {
-                                    GradientStops = new GradientStopCollection()
-                                    {
-                                        new GradientStop(Colors.IndianRed, 0),
-                                        new GradientStop(Colors.IndianRed, 1)
-                                    }
-                                };
-                            }
-                            else
-                            {
-                                // reset border
-                                textBox.BorderBrush = new LinearGradientBrush()
-                                {
-                                    GradientStops = new GradientStopCollection()
-                                    {
-                                        new GradientStop(Colors.LightGray, 0),
-                                        new GradientStop(Colors.LightGray, 1)
-                                    }
-                                };
-
-                                Controller?.ApplyInput(text, textBox);
-                            }
-                        }
-                    });
-                });
+                    textBox.TextChanged -= TextBox_TextChanged;
+                }
+                catch (Exception ex)
+                {
+                }
             }
         }
 
         private void FolderSource_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if(Controller == null)
+            if (Controller == null)
                 return;
 
-            if(Controller.Folder == null)
+            if (Controller.Folder == null)
                 return;
 
             Controller?.FolderStructureChange();
@@ -144,6 +161,21 @@ namespace AAMFileNaming
             {
                 SideMenuGrid.Width = new GridLength(250);
             }
+        }
+
+        private void UniquenessButton_Click(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+
+            if (button == null)
+                return;
+
+            var tag = button.Tag;
+
+            if (tag == null)
+                return;
+
+            var input = tag.ToString();
         }
     }
 }

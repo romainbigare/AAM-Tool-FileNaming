@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 
-namespace AAMFileNaming
+namespace AAMFileNamingCore.DataModel
 {
     public class AbbreviationAttribute : Attribute
     {
@@ -26,7 +26,7 @@ namespace AAMFileNaming
         {
             Category = category;
         }
-    }   
+    }
 
     public class EnglishNameAttribute : Attribute
     {
@@ -36,7 +36,7 @@ namespace AAMFileNaming
         {
             EnglishName = englishName;
         }
-    }   
+    }
 
     public enum DocumentType
     {
@@ -1235,7 +1235,7 @@ namespace AAMFileNaming
         [EnglishName("Documents related to the EES package")]
         EESPackage,
 
-        [Abbreviation("09EXW")] 
+        [Abbreviation("09EXW")]
         [Category("09 - Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the EXW package")]
         EXWPackage,
@@ -1376,22 +1376,18 @@ namespace AAMFileNaming
     public enum Role
     {
         [Abbreviation("AR")]
-        [Category("Role : Architecture")]
         [EnglishName("Architecture")]
         Architecture,
 
         [Abbreviation("LA")]
-        [Category("Role : Landscape")]
         [EnglishName("Landscape")]
         Landscape,
 
         [Abbreviation("IM")]
-        [Category("Role : BIM Information Management")]
         [EnglishName("BIM Information Management")]
         BIMInformationManagement,
 
         [Abbreviation("PD")]
-        [Category("Role : Principal Designer")]
         [EnglishName("Principal Designer")]
         PrincipalDesigner
     }
@@ -1460,17 +1456,19 @@ namespace AAMFileNaming
             // and add children with enum values
             var values = Enum.GetValues(t);
             var treeViewItems = new List<TreeViewItem>();
-            foreach ( var value in values )
+            foreach (var value in values)
             {
                 var category = GetCategory(value);
                 var abbreviation = GetAbbreviation(value);
+                if(abbreviation == null) continue; // skip if abbreviation is null (not needed in treeview
+                if(String.IsNullOrEmpty(abbreviation)) continue; // skip if abbreviation is empty (not needed in treeview
                 var englishName = GetEnglishName(value);
-                if ( category != null )
+                if (category != null)
                 {
-                    var categoryTreeViewItem = treeViewItems.FirstOrDefault(x => x.Header.ToString().ToLower() == category.ToLower());
-                    if ( categoryTreeViewItem == null )
+                    var categoryTreeViewItem = treeViewItems.FirstOrDefault(x => x.Header?.ToString()?.ToLower() == $"{abbreviation?.First()}X - {category}".ToLower());
+                    if (categoryTreeViewItem == null)
                     {
-                        categoryTreeViewItem = new TreeViewItem { Header = category, Tag = value };
+                        categoryTreeViewItem = new TreeViewItem { Header = $"{abbreviation?.First()}X - {category}", Tag = value };
                         treeViewItems.Add(categoryTreeViewItem);
                     }
 
@@ -1479,7 +1477,7 @@ namespace AAMFileNaming
                 }
                 else
                 {
-                    var treeViewItem = new TreeViewItem { Header = $"{abbreviation} - {englishName}" , Tag = value };
+                    var treeViewItem = new TreeViewItem { Header = $"{abbreviation} - {englishName}", Tag = value };
                     treeViewItems.Add(treeViewItem);
                 }
             }

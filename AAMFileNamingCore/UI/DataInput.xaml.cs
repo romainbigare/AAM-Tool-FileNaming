@@ -1,20 +1,13 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
+using AAMFileNamingCore.DataModel;
+using TypeCode = AAMFileNamingCore.DataModel.TypeCode;
 
-namespace AAMFileNaming
+namespace AAMFileNamingCore.UI
 {
     /// <summary>
     /// Interaction logic for DataInput.xaml
@@ -79,12 +72,12 @@ For Sketch (SK) drawings, the type code should be 00.";
             SelectedItem = selectedItem.Tag;
             SaveResult = true;
             // get selected item
-            this.Close();
+            Close();
         }
 
         private void btnCancel_Click(object sender, RoutedEventArgs e)
         {
-            this.Close();
+            Close();
         }
     }
 }

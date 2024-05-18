@@ -1,0 +1,46 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net6.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="C:\Users\rbigare\.nuget\packages\nlog.config\4.7.15\contentFiles\any\any\NLog.config" />
+    <None Remove="NLog.config" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="NLog.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="HandyControl" Version="3.5.1" />
+    <PackageReference Include="NLog" Version="5.3.2" />
+    <PackageReference Include="NLog.Schema" Version="5.3.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="UI\DataInput.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Update="UI\ExtensionFilter.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="&quot;C:\Program Files (x86)\Microsoft SDKs\ClickOnce\SignTool\signtool.exe&quot; sign /debug /fd SHA256 /f &quot;X:\AAM-WORKGROUP DATA\AAM_BIM\AAM_BIMRESOURCES\AAM Revit Plugins\Resources\Security\AAMCERT.pfx&quot; /p AAMBIM &quot;$(TargetPath)&quot;&quot;&#xD;&#xA;           &#xD;&#xA;" />
+	</Target>
+
+
+	<Target Name="CopyDll" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="X:\AAM-WORKGROUP DATA\AAM_BIM\AAM_DesignTechnology\03_Automation and Tool Development\09_OfficeTools\AAMFileNaming\00_Current" />
+	</Target>
+
+</Project>

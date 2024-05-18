@@ -1,18 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
-namespace AAMFileNaming
+namespace AAMFileNamingCore.UI
 {
     /// <summary>
     /// Interaction logic for ExtensionFilter.xaml
@@ -36,8 +26,8 @@ namespace AAMFileNaming
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            this.IsSaved = false;
-            this.Close();
+            IsSaved = false;
+            Close();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -53,8 +43,8 @@ namespace AAMFileNaming
                 SelectedExtensions.Add(item.ToString());
             }
 
-            this.IsSaved = true;
-            this.Close();
+            IsSaved = true;
+            Close();
         }
     }
 }
