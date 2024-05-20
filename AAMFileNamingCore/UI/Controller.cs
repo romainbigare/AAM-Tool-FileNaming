@@ -98,6 +98,7 @@ namespace AAMFileNamingCore.UI
         public async void SetFolder(string? path, bool subfolders, List<string> filters = null)
         {
             Logger.Info($"Setting folder to {path}, include subfolders : {subfolders}");
+
             RefreshUILayout(isLoading: true);
             ProgressButtonInit();
             await Task.Delay(100);
@@ -105,7 +106,18 @@ namespace AAMFileNamingCore.UI
             try
             {
                 if (path != null)
-                    await Task.Run(() => Folder.ChangeTarget(path, subfolders, filters, UpdateProgress));
+                {
+                    var parts = path.Split("\\");
+                    if(path.StartsWith("X") && parts.Count() < 4)
+                    {
+                        MessageBox.Show("Bulk renaming on this folder is forbidden.", "Access forbidden", MessageBoxButton.OK, MessageBoxImage.Exclamation);
+                    }
+                    else
+                    {
+                        await Task.Run(() => Folder.ChangeTarget(path, subfolders, filters, UpdateProgress));
+                    }
+
+                }
             }
             catch (Exception ex)
             {
