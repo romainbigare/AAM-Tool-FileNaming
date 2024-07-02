@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Markup;
 using System.Xml.Linq;
 
 namespace AAMFileNamingCore.DataModel
@@ -48,7 +50,7 @@ namespace AAMFileNamingCore.DataModel
 
 
             file.Role = await GuessRole(file.Path);
-            file.TypeCode = await GuessTypeCode(file.Path, file.Extension);
+            file.TypeCode = await GuessTypeCode(file.DocumentTypeIso, file.Path, file.Extension);
             file.DrawingSerialNo = await GuessDrawingSerialNo();
             file.FileType = await GuessFileType();
             (file.Description, file.Volume, file.Level) = await GuessDocumentContent(file.Name, file.Extension);
@@ -56,7 +58,6 @@ namespace AAMFileNamingCore.DataModel
 
             return true;
         }
-
 
         public static async Task<bool> GuessFromExistingIsoName(File file)
         {
@@ -80,9 +81,9 @@ namespace AAMFileNamingCore.DataModel
                 file.Level = GuessLevel(file.Name, file.Extension);
 
             if (names.Length > 3)
-                file.DocumentType = (DocumentType)NamingLists.GetValue(typeof(DocumentType), names[3]);
+                file.DocumentTypeIso = (DocumentTypeIso)NamingLists.GetValue(typeof(DocumentTypeIso), names[3]);
             else
-                file.DocumentType = await GuessDocumentType(file.Path, file.Extension, file.Name);
+                file.DocumentTypeIso = await GuessDocumentTypeIso(file.Path, file.Extension, file.Name);
 
             if (names.Length > 4)
                 file.Role = (Role)NamingLists.GetValue(typeof(Role), names[4]);
@@ -108,14 +109,13 @@ namespace AAMFileNamingCore.DataModel
                     file.Description = "";
             }
 
-            file.TypeCode = await GuessTypeCode(file.Path, file.Extension);
+            file.TypeCode = await GuessTypeCode(file.DocumentTypeIso, file.Path, file.Extension);
             file.DateOfIssue = await GuessDateOfIssue(file.Path);
             file.FileType = await GuessFileType();
             file.Revision = "";
 
             return true;
         }
-
 
         public static async Task<FileType> GuessFileType()
         {
@@ -720,22 +720,30 @@ namespace AAMFileNamingCore.DataModel
         public static async Task<string> GuessDateOfIssue(string Path)
         {
             // return the date of file creation, format YYYYMMDD
-            return System.IO.File.GetCreationTime(Path).ToString("yyyyMMdd");
+            return System.IO.File.GetCreationTime(Path).ToString("yyMMdd");
         }
 
-        public static async Task<TypeCode> GuessTypeCode(string Path, string Extension)
+        public static async Task<TypeCode> GuessTypeCode(DocumentTypeIso type, string Path, string Extension)
         {
-            var fromExtension = await GuessTypeCodeFromExtension(Extension);
-            if (fromExtension != TypeCode.None)
-                return fromExtension;
-            var fromPath = await GuessTypeCodeFromPath(Path);
-            if (fromPath != TypeCode.None)
-                return fromPath;
-            var fromContent = await GuessTypeCodeFromContent();
-            if (fromContent != TypeCode.None)
-                return fromContent;
+            List<string> AcceptableTypeCodes = new List<string> { "DR", "SP", "SH", };
+
+            var typeCode = NamingLists.GetAbbreviation(type);
+            
+            if(AcceptableTypeCodes.Contains(typeCode))
+            {
+                var fromExtension = await GuessTypeCodeFromExtension(Extension);
+                if (fromExtension != TypeCode.None)
+                    return fromExtension;
+                var fromPath = await GuessTypeCodeFromPath(Path);
+                if (fromPath != TypeCode.None)
+                    return fromPath;
+                var fromContent = await GuessTypeCodeFromContent();
+                if (fromContent != TypeCode.None)
+                    return fromContent;
+            }
 
             return TypeCode.Sketches;
+            
         }
 
         public static async Task<TypeCode> GuessTypeCodeFromExtension(string Extension)
@@ -872,118 +880,140 @@ namespace AAMFileNamingCore.DataModel
 
         public static async Task<DocumentType> GuessDocumentType(string Path, string extension, string fileName)
         {
+            // letter
+            if(Path.Contains("letter", StringComparison.OrdinalIgnoreCase))
+                return DocumentType.Letter;
+
+            // agenda
+            if(Path.Contains("agenda", StringComparison.OrdinalIgnoreCase))
+                return DocumentType.Agenda;
+
+            // minutes
+            if(Path.Contains("minutes", StringComparison.OrdinalIgnoreCase))
+                return DocumentType.Minutes;
+
+            // publicity
+            if(Path.Contains("publicity", StringComparison.OrdinalIgnoreCase))
+                return DocumentType.Publicity;
+
+            return DocumentType.None;
+            
+        }
+        
+        public static async Task<DocumentTypeIso> GuessDocumentTypeIso(string Path, string extension, string fileName)
+        {
             // If filename didn't match, check file path
             if (Path.Contains("drawings", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Drawing;
+                return DocumentTypeIso.Drawing;
             else if (Path.Contains("sketches", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Sketch;
+                return DocumentTypeIso.Sketch;
             else if (Path.Contains("schedules", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Schedule;
+                return DocumentTypeIso.Schedule;
             else if (Path.Contains("specifications", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Specification;
+                return DocumentTypeIso.Specification;
             else if (Path.Contains("animations", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Animation;
+                return DocumentTypeIso.Animation;
             else if (Path.Contains("architect instructions", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.ArchitectsInstruction;
+                return DocumentTypeIso.ArchitectsInstruction;
             else if (Path.Contains("appointments", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Appointment;
+                return DocumentTypeIso.Appointment;
             else if (Path.Contains("bids", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Bid;
+                return DocumentTypeIso.Bid;
             else if (Path.Contains("briefs", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Brief;
+                return DocumentTypeIso.Brief;
             else if (Path.Contains("correspondence", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Correspondence;
+                return DocumentTypeIso.Correspondence;
             else if (Path.Contains("certificates", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Certificate;
+                return DocumentTypeIso.Certificate;
             else if (Path.Contains("document issues", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.DocumentIssue;
+                return DocumentTypeIso.DocumentIssue;
             else if (Path.Contains("documents", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Document;
+                return DocumentTypeIso.Document;
             else if (Path.Contains("file notes", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.FileNotes;
+                return DocumentTypeIso.FileNotes;
             else if (Path.Contains("health and safety", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.HealthAndSafety;
+                return DocumentTypeIso.HealthAndSafety;
             else if (Path.Contains("information exchange", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.InformationExchange;
+                return DocumentTypeIso.InformationExchange;
             else if (Path.Contains("3d models", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Model3D;
+                return DocumentTypeIso.Model3D;
             else if (Path.Contains("minutes", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Minutes;
+                return DocumentTypeIso.Minutes;
             else if (Path.Contains("project directories", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.ProjectDirectory;
+                return DocumentTypeIso.ProjectDirectory;
             else if (Path.Contains("programmes", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Programme;
+                return DocumentTypeIso.Programme;
             else if (Path.Contains("photos", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Photo;
+                return DocumentTypeIso.Photo;
             else if (Path.Contains("presentations", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Presentation;
+                return DocumentTypeIso.Presentation;
             else if (Path.Contains("room data sheets", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.RoomDataSheet;
+                return DocumentTypeIso.RoomDataSheet;
             else if (Path.Contains("requests for information", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.RequestForInformation;
+                return DocumentTypeIso.RequestForInformation;
             else if (Path.Contains("responsibility matrices", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.ResponsibilityMatrix;
+                return DocumentTypeIso.ResponsibilityMatrix;
             else if (Path.Contains("reports", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Report;
+                return DocumentTypeIso.Report;
             else if (Path.Contains("trackers", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Tracker;
+                return DocumentTypeIso.Tracker;
             else if (Path.Contains("visualisations", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Visualisation;
+                return DocumentTypeIso.Visualisation;
 
             if (extension.Equals(".dwg", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Drawing;
+                return DocumentTypeIso.Drawing;
             else if (extension.Equals(".skp", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Model3D;
+                return DocumentTypeIso.Model3D;
             else if (extension.Equals(".dgn", StringComparison.OrdinalIgnoreCase) || extension.Equals(".ai", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Drawing;
+                return DocumentTypeIso.Drawing;
             else if (extension.Equals(".rvt", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Model3D;
+                return DocumentTypeIso.Model3D;
             else if (extension.Equals(".ifc", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Model3D;
+                return DocumentTypeIso.Model3D;
             else if (extension.Equals(".3dm", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Model3D;
+                return DocumentTypeIso.Model3D;
             else if (extension.Equals(".nwc", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Model3D;
+                return DocumentTypeIso.Model3D;
             else if (extension.Equals(".xls", StringComparison.OrdinalIgnoreCase) || extension.Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Schedule;
+                return DocumentTypeIso.Schedule;
             else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Specification;
+                return DocumentTypeIso.Specification;
             else if (extension.Equals(".avi", StringComparison.OrdinalIgnoreCase) || extension.Equals(".mp4", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Animation;
+                return DocumentTypeIso.Animation;
             else if (extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Drawing;
+                return DocumentTypeIso.Drawing;
             else if (extension.Equals(".ics", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Appointment;
+                return DocumentTypeIso.Appointment;
             else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Brief;
+                return DocumentTypeIso.Brief;
             else if (extension.Equals(".msg", StringComparison.OrdinalIgnoreCase) || extension.Equals(".eml", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Correspondence;
+                return DocumentTypeIso.Correspondence;
             else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Document;
+                return DocumentTypeIso.Document;
             else if (extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.FileNotes;
+                return DocumentTypeIso.FileNotes;
             else if (extension.Equals(".fbx", StringComparison.OrdinalIgnoreCase) || extension.Equals(".obj", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Model3D;
+                return DocumentTypeIso.Model3D;
             else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Minutes;
+                return DocumentTypeIso.Minutes;
             else if (extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Drawing;
+                return DocumentTypeIso.Drawing;
             else if (extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) || extension.Equals(".png", StringComparison.OrdinalIgnoreCase) || extension.Equals(".psd", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Photo;
+                return DocumentTypeIso.Photo;
             else if (extension.Equals(".ppt", StringComparison.OrdinalIgnoreCase) || extension.Equals(".pptx", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Presentation;
+                return DocumentTypeIso.Presentation;
             else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Report;
+                return DocumentTypeIso.Report;
             else if (extension.Equals(".indd", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Report;
+                return DocumentTypeIso.Report;
 
             else if (extension.Equals(".xls", StringComparison.OrdinalIgnoreCase) || extension.Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Tracker;
+                return DocumentTypeIso.Tracker;
             else if (extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) || extension.Equals(".png", StringComparison.OrdinalIgnoreCase))
-                return DocumentType.Visualisation;
+                return DocumentTypeIso.Visualisation;
 
             // If none of the conditions matched, return None
-            return DocumentType.Document;
+            return DocumentTypeIso.Document;
         }
 
         public static async Task<string> GuessProjectNumber(string path)
@@ -993,25 +1023,92 @@ namespace AAMFileNamingCore.DataModel
             // X:\P\20103\WORK\ARCH => 20103
             // X:\P\23161\WORK\ADMIN => 23161
             // X:\P\23147_01\WORK   => 23147_01
+            // C:\Users\rbigare\Documents\21197-AAM-A1-ZZ-M3-A-00001_Building A1_detached_rbigare@alliesandmorrison.com.rvt
 
-            // split with '\'
-            var parts = path.Split('\\');
+            if (path.StartsWith("X"))
+            {
+                // split with '\'
+                var parts = path.Split('\\');
 
-            // find the first part that contains a number
-            var projectNumber = parts.FirstOrDefault(p => p.Any(char.IsDigit));
+                // find the first part that contains a number
+                var projectNumber = parts.FirstOrDefault(p => p.Any(char.IsDigit));
 
-            // if not found, return empty string
-            if (projectNumber == null)
-                return "";
+                // if not found, return empty string
+                if (projectNumber == null)
+                    return "";
 
-            // remove all non-digit characters, but keep the underscore
-            projectNumber = new string(projectNumber.Where(char.IsDigit).ToArray());
+                // split with "_"
+                parts = projectNumber.Split('_');
+                var number = parts.FirstOrDefault(p => p.Any(char.IsDigit) && p.Length > 1 && p.Length < 6);
 
-            // if the project number is empty, return empty string
-            if (string.IsNullOrEmpty(projectNumber))
-                return "";
+                if (String.IsNullOrEmpty(number))
+                    return "";
 
-            return projectNumber;
+                // remove all non-digit characters, but keep the underscore
+                projectNumber = new string(number.Where(c => char.IsDigit(c)).ToArray());
+
+                // if the project number is empty, return empty string
+                if (string.IsNullOrEmpty(projectNumber))
+                    return "";
+
+                return projectNumber;
+            }
+
+            else if (path.Contains("panzura"))
+            {
+                // path will be :  \\aam - panzura\aam - data\P\ project number \something
+                // extract the project number from the path
+                var parts = path.Split('\\');
+
+                var projectNumber = parts.FirstOrDefault(p => p.Any(char.IsDigit) && p.Length > 1 && p.Length < 6);
+
+                if (String.IsNullOrEmpty(projectNumber))
+                    return "";
+
+                parts = projectNumber.Split('_');
+                var number = parts.FirstOrDefault(p => p.Any(char.IsDigit) && p.Length > 1 && p.Length < 6);
+
+                if (String.IsNullOrEmpty(number))
+                    return "";
+
+                // remove all non-digit characters, but keep the underscore
+
+                projectNumber = new string(number.Where(c => char.IsDigit(c)).ToArray());
+
+                // if the project number is empty, return empty string
+                if (string.IsNullOrEmpty(projectNumber))
+                    return "";
+
+                return projectNumber;
+            }
+
+            else
+            {
+                // take file name, split with "_", but also split with "-" and find the most frequent divider
+                var fileName = Path.GetFileNameWithoutExtension(path);
+                var underscores = fileName.Split('_');
+                var dashes = fileName.Split('-');
+
+                var divider = underscores.Length > dashes.Length ? '_' : '-';
+
+                // split with the most frequent divider
+                var parts = fileName.Split(divider);
+                var projectNumber = parts.FirstOrDefault(p => p.Any(char.IsDigit) && p.Length > 1 && p.Length < 6);
+
+                // if not found, return empty string
+                if (projectNumber == null)
+                    return "";
+
+                // remove all non-digit characters
+                projectNumber = new string(projectNumber.Where(char.IsDigit).ToArray());
+
+                // if the project number is empty, return empty string
+                if (string.IsNullOrEmpty(projectNumber))
+                    return "";
+
+                return projectNumber;
+            }
+           
         }
 
         internal static async void GuessFromScratch(File file)
@@ -1019,9 +1116,10 @@ namespace AAMFileNamingCore.DataModel
             file.ProjectNumber = await GuessProjectNumber(file.Path);
             file.Originator = "AAM";
             file.Revision = "";
+            file.DocumentTypeIso = await GuessDocumentTypeIso(file.Path, file.Extension, file.Name);
             file.DocumentType = await GuessDocumentType(file.Path, file.Extension, file.Name);
             file.Role = await GuessRole(file.Path);
-            file.TypeCode = await GuessTypeCode(file.Path, file.Extension);
+            file.TypeCode = await GuessTypeCode(file.DocumentTypeIso, file.Path, file.Extension);
             file.DrawingSerialNo = await GuessDrawingSerialNo();
             file.DateOfIssue = await GuessDateOfIssue(file.Path);
             file.FileCode = await GuessFileCode(file.Path);

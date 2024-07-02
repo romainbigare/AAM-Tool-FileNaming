@@ -1,4 +1,5 @@
-﻿using NLog;
+﻿using AAMFileNaming.Shared.Logging;
+using NLog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -10,8 +11,6 @@ namespace AAMFileNaming
 {
     internal class AutoUpdater
     {
-        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
-
         internal static string Update()
         {
             // check if Rhini 8 or Rhino 7
@@ -24,13 +23,13 @@ namespace AAMFileNaming
             // check if folder exists
             if (!Directory.Exists(folder_server))
             {
-                Logger.Error("RENAAME : error updating could not find server folder");
+                AAMLogger.Error("RENAAME : error updating could not find server folder");
                 return "RENAAME : error updating could not find server folder";
             }
 
             if (!Directory.Exists(folder_local))
             {
-                Logger.Error("RENAAME : error updating could not find local folder");
+                AAMLogger.Error("RENAAME : error updating could not find local folder");
                 return "RENAAME : error updating could not find local folder";
             }
 
@@ -48,11 +47,11 @@ namespace AAMFileNaming
                             try
                             {
                                 File.Copy(server_file_path, local_file.FullName, true);
-                                Logger.Info($"RENAAME : updated file {local_file.Name}");
+                                AAMLogger.Info($"RENAAME : updated file {local_file.Name}");
                             }
                             catch (Exception ex)
                             {
-                                Logger.Error($"RENAAME : ERROR could not update file {local_file.Name}, error: {ex.Message}");
+                                AAMLogger.Error($"RENAAME : ERROR could not update file {local_file.Name}, error: {ex.Message}");
                             }
 
                         }
@@ -60,7 +59,7 @@ namespace AAMFileNaming
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"RENAAME : error updating file {local_file.Name}, error: {ex.Message}");
+                    AAMLogger.Error($"RENAAME : error updating file {local_file.Name}, error: {ex.Message}");
                 }
 
             }
@@ -80,19 +79,19 @@ namespace AAMFileNaming
                         {
                             Directory.CreateDirectory(Path.GetDirectoryName(local_file_path));
                             File.Copy(server_file.FullName, local_file_path);
-                            Logger.Info($"RENAAME : created file {server_file.Name}");
+                            AAMLogger.Info($"RENAAME : created file {server_file.Name}");
 
                         }
                         catch (Exception ex)
                         {
-                            Logger.Error($"RENAAME : ERROR could not create file {server_file.Name}, error: {ex.Message}");
+                            AAMLogger.Error($"RENAAME : ERROR could not create file {server_file.Name}, error: {ex.Message}");
                         }
 
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error($"RENAAME : error creating file {server_file.Name}, error: {ex.Message}");
+                    AAMLogger.Error($"RENAAME : error creating file {server_file.Name}, error: {ex.Message}");
                 }
 
             }

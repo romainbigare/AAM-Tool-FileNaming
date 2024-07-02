@@ -3,6 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AAMFileNamingCore.UI"
         xmlns:hc="https://handyorg.github.io/handycontrol"
         Background="#efefef"
         mc:Ignorable="d"
@@ -14,13 +15,16 @@
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/SkinDefault.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/HandyControl;component/Themes/Theme.xaml"/>
             </ResourceDictionary.MergedDictionaries>
-
+            
             <Style TargetType="hc:TextBox">
-                <Setter Property="ToolTipService.InitialShowDelay" Value="50"/>
+                <Setter Property="ToolTipService.InitialShowDelay" Value="10"/>
             </Style>
             <Style TargetType="TextBox">
-                <Setter Property="ToolTipService.InitialShowDelay" Value="50"/>
+                <Setter Property="ToolTipService.InitialShowDelay" Value="10"/>
             </Style>
+            
+            <local:TypeCodeEnabledConverter x:Key="TypeCodeEnabledConverter" />
+
         </ResourceDictionary>
     </Window.Resources>
     
@@ -49,6 +53,7 @@
             <TextBlock Text="Allies and Morrison" FontWeight="SemiBold" FontSize="15" Margin="20, 20, 20, 30" Grid.Row="0" />
             <!--TextBlock Text="Some instructions here" TextWrapping="Wrap"  Margin="20,5" Grid.Row="1" -->
             <hc:ComboBox Name="FolderSource" Style="{StaticResource ComboBox.Small}" Margin="20,10"  Height="30"
+                         Visibility="Collapsed"
                         Cursor="Hand" Grid.Row="2"  SelectionChanged="FolderSource_SelectionChanged">
                 <ComboBoxItem Content="Folder content only" IsSelected="True" />
                 <ComboBoxItem Content="Include all subfolders" />
@@ -75,6 +80,7 @@
                         Cursor="Hand" Grid.Row="6"  SelectionChanged="ComboBox_SelectionChanged">
                 <ComboBoxItem Content="BS EN ISO 19650" IsSelected="True" />
                 <ComboBoxItem Content="Other Documents" />
+                <ComboBoxItem Content="For Comments" />
             </hc:ComboBox>
 
 
@@ -83,7 +89,7 @@
                                 Value="0" Foreground="#FF0078D7" Height="30" Grid.Row="4" /-->
 
 
-            <Button Content="💾 Save Selected" Style="{StaticResource ButtonSuccess}" Margin="20, 30"  VerticalAlignment="Bottom"
+            <Button Content="💾 Rename (selection only)" Style="{StaticResource ButtonSuccess}" Margin="20, 30"  VerticalAlignment="Bottom"
                 Click="SaveButton_Click"  Cursor="Hand" Grid.Row="12" HorizontalAlignment="Stretch"/>
 
             <Button Content="☰" Style="{StaticResource ButtonDefault.Small}" Margin="5, 20, 10, 0"  VerticalAlignment="Top"
@@ -135,7 +141,7 @@
                     <DataGridTemplateColumn Width=".8*" Header="Project No">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox Text="{Binding ProjectNumber, Mode=OneWay}" Tag="ProjectNumber" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"  HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding ProjectNumber, Mode=OneWay}" Tag="ProjectNumber" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"  HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
                                         <StackPanel MaxWidth="300">
                                             <TextBlock Text="Note" FontWeight="SemiBold" />
@@ -152,7 +158,7 @@
                     <DataGridTemplateColumn Width=".7*" Header="Originator">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button IsEnabled="False" Opacity="0.8" Content="{Binding Originator, Mode=OneWay}" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}" />
+                                <Button  IsEnabled="False" Opacity="0.8" Content="{Binding Originator, Mode=OneWay}" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}" />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -160,7 +166,7 @@
                     <DataGridTemplateColumn Width=".7*" Header="Volume">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox Text="{Binding Volume, Mode=OneWay}" Tag="Volume" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}">
+                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding Volume, Mode=OneWay}" Tag="Volume" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}">
                                     <hc:TextBox.ToolTip>
                                         <StackPanel MaxWidth="300">
                                             <TextBlock Text="Note" FontWeight="SemiBold" />
@@ -189,7 +195,7 @@
                     <DataGridTemplateColumn Width=".7*" Header="Type">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="{Binding DocumentTypeString, Mode=OneWay}" Cursor="Hand"  Tag="DocumentType" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}"  Click="GridButton_Click"  />
+                                <Button Content="{Binding DocumentTypeIsoString, Mode=OneWay}" Cursor="Hand"  Tag="DocumentTypeIso" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}"  Click="GridButton_Click"  />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -205,7 +211,7 @@
                     <DataGridTemplateColumn Width=".7*" Header="TypeCode">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <Button Content="{Binding TypeCodeString, Mode=OneWay}" Cursor="Hand" Tag="TypeCode" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}"  Click="GridButton_Click"  />
+                                <Button IsEnabled="{Binding DocumentTypeIsoString, Converter={StaticResource TypeCodeEnabledConverter}}" Content="{Binding TypeCodeString, Mode=OneWay}" Cursor="Hand" Tag="TypeCode" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}"  Click="GridButton_Click"  />
                             </DataTemplate>
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
@@ -219,7 +225,7 @@
                         
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox Text="{Binding DrawingSerialNo, Mode=OneWay}" Tag="DrawingSerialNo" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"  >
+                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding DrawingSerialNo, Mode=OneWay}" Tag="DrawingSerialNo" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"  >
                                     <hc:TextBox.ToolTip>
                                         <StackPanel MaxWidth="300">
                                             <TextBlock Text="Note" FontWeight="SemiBold" />
@@ -237,7 +243,7 @@
 ">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox Text="{Binding Description, Mode=OneWay}" Tag="Description" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"  Height="20" Style="{StaticResource TextBox.Small}" HorizontalAlignment="Stretch" >
+                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding Description, Mode=OneWay}" Tag="Description" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"  Height="20" Style="{StaticResource TextBox.Small}" HorizontalAlignment="Stretch" >
                                     <hc:TextBox.ToolTip>
                                         <StackPanel MaxWidth="300">
                                             <TextBlock Text="Note" FontWeight="SemiBold" />
@@ -291,7 +297,7 @@
                     <DataGridTemplateColumn Width=".8*" Header="Project No">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox Text="{Binding ProjectNumber, Mode=OneWay}"  Tag="ProjectNumber" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding ProjectNumber, Mode=OneWay}"  Tag="ProjectNumber" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
                                         <StackPanel MaxWidth="300">
                                             <TextBlock Text="Note" FontWeight="SemiBold" />
@@ -324,7 +330,7 @@
                     <DataGridTemplateColumn Width=".7*" Header="Date">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox Text="{Binding DateOfIssue, Mode=OneWay}"  Tag="DateOfIssue" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding DateOfIssue, Mode=OneWay}"  Tag="DateOfIssue" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
                                         <StackPanel MaxWidth="300">
                                             <TextBlock Text="Note" FontWeight="SemiBold" />
@@ -339,7 +345,7 @@
                     <DataGridTemplateColumn Width=".7*" Header="Revision (optional)">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox Text="{Binding Revision, Mode=OneWay}"  Tag="Revision" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding Revision, Mode=OneWay}"  Tag="Revision" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
                                         <StackPanel MaxWidth="300">
                                             <TextBlock Text="Note" FontWeight="SemiBold" />
@@ -358,7 +364,7 @@
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox Text="{Binding Description, Mode=OneWay}"  Tag="Description" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding Description, Mode=OneWay}"  Tag="Description" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
                                         <StackPanel MaxWidth="300">
                                             <TextBlock Text="Note" FontWeight="SemiBold" />
@@ -381,6 +387,44 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn-->
 
+                </DataGrid.Columns>
+            </DataGrid>
+            <DataGrid
+                Name="DatagridForComments"
+                Grid.Row="2"
+                Visibility="Collapsed"
+                Style="{StaticResource DataGrid.Small}"
+                ItemsSource="{Binding Controller.Folder.Files, Mode=OneWay}"
+                Margin="15"
+                BorderThickness="0"
+                VirtualizingPanel.IsVirtualizing="False"
+                AutoGenerateColumns="False"
+                CanUserAddRows="False" 
+                CanUserDeleteRows="False" 
+                CanUserReorderColumns="False" 
+                CanUserResizeColumns="True" 
+                CanUserResizeRows="False" 
+                CanUserSortColumns="True" 
+                SelectionMode="Extended"
+                ColumnHeaderStyle="{StaticResource DataGridColumnHeaderStyle}"
+                CellStyle="{StaticResource DataGridCellStyle.Small}"
+                SelectionUnit="FullRow" >
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn Width="22">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Rectangle Fill="{Binding IndicatorColor, Mode=OneWay}" Width="15" Height="20" Margin="0"/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTextColumn Width="100" Binding="{Binding Extension, Mode=OneWay}">
+                        <DataGridTextColumn.Header>
+                            <Button Content="🔍 Format" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}" Click="FilterFormatButton_Click" />
+                        </DataGridTextColumn.Header>
+                    </DataGridTextColumn>
+                    <DataGridTextColumn Width="*" Header="Current Name" Binding="{Binding Name, Mode=OneWay}" />
+
+                    <DataGridTextColumn Width="1.9*" Header="New Name" Binding="{Binding NewNameForComments, Mode=OneWay}"  />
                 </DataGrid.Columns>
             </DataGrid>
 

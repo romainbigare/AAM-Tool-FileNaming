@@ -36,17 +36,75 @@ namespace AAMFileNamingCore.DataModel
         public void ChangeTarget(string target, bool subfolders, List<string> filters, Action<double> updateProgress)
         {
             UIDispatcher.Invoke(() => Files.Clear());
-            Path = target;
+
+            // CAREFUL, HERE THE FOLDER CAN ALSO BE A FILE PATH
+            bool isFilePath = System.IO.File.Exists(target);
+            string folderPath = isFilePath ? System.IO.Path.GetDirectoryName(target) : target;
+
+
+            Path = folderPath;
             int count = 0;
 
             try
             {
-                string[] extensionsToClear = new string[] { ".lnk", ".bak", ".dat", ".skb", ".rws", ".3dmbak", ".000", ".db", ".slog", ".tmp", ".css", ".log" }; // add extensions to clear here
+                string[] extensionsToClear = new string[] 
+                { 
+                    ".lnk", 
+                    ".bak", 
+                    ".dat", 
+                    ".skb",
+                    ".rws", 
+                    ".3dmbak",
+                    ".000", 
+                    ".db", 
+                    ".slog", 
+                    ".tmp", 
+                    ".css", 
+                    ".log",
+                    ".1",
+                    ".2", 
+                    ".3", 
+                    ".4", 
+                    ".5", 
+                    ".6", 
+                    ".7", 
+                    ".8",
+                    ".a", 
+                    ".b", 
+                    ".c", 
+                    ".d", 
+                    ".z", 
+                    ".bat", 
+                    ".py", 
+                    ".f", 
+                    ".h", 
+                    ".exe", 
+                    ".dll", 
+                    ".pyc", 
+                    ".pyd", 
+                    ".pyf", 
+                    ".pyw", 
+                    ".lib", 
+                    ".cs",
+                    ".binarypb", 
+                    ".build",
+                    ".bz2",
 
-                var files = System.IO.Directory.GetFiles(target, "", subfolders ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly);
+                }; // add extensions to clear here
 
-                // sort by extension and then by name
-                files = files.OrderBy(f => System.IO.Path.GetExtension(f)).ThenBy(f => System.IO.Path.GetFileName(f)).ToArray();
+                string[]? files = null;
+
+                if (isFilePath)
+                {
+                    // IF THE TARGET IS A FILE PATH AND NOT A DIRECTORY PATH, WE JUST NEED TO DISPLAY ONE FILE
+                    files = new string[] { target };
+                }
+                else
+                {
+                    // sort by extension and then by name
+                    files = System.IO.Directory.GetFiles(target, "", subfolders ? System.IO.SearchOption.AllDirectories : System.IO.SearchOption.TopDirectoryOnly);
+                    files = files.OrderBy(f => System.IO.Path.GetExtension(f)).ThenBy(f => System.IO.Path.GetFileName(f)).ToArray();
+                }
 
                 int max = files.Length;
                 foreach (var file in files)

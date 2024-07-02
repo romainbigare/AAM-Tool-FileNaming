@@ -15,8 +15,10 @@ namespace AAMFileNamingCore.UI
     public partial class DataInput : Window
     {
 
+        public Type inputType { get; set; }
         public bool SaveResult { get; set; } = false;
         public object SelectedItem { get; set; } = null;
+        public bool manualOverride { get; private set; } = false;
         public Controller Controller { get; set; }
 
         public DataInput()
@@ -32,6 +34,7 @@ namespace AAMFileNamingCore.UI
             InfoBox.Text = GetTooltip(input);
             Treeview.ItemsSource = GetChoices(input);
             Controller = controller;
+            inputType = input;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -51,8 +54,11 @@ The level code in file names should generally match the levels as shown on drawi
             if (input == typeof(Role))
                 return @"Always use 'AR' for files produced by AAM Architecture. LA may be used by AAM Landscape.";
 
-            if (input == typeof(DocumentType))
+            if (input == typeof(DocumentTypeIso))
                 return @"Use 'DR' for all drawings except Sketches (where 'SK' should be used).";
+
+            if(input == typeof(DocumentType))
+                return @"Most commonly left empty.";
 
             if (input == typeof(TypeCode))
                 return @"The type code system is derived from the CI/SfB Construction Indexing classification system (also used in Microstation level menu and in AAM library).
@@ -66,10 +72,23 @@ For Sketch (SK) drawings, the type code should be 00.";
         private void btnOk_Click(object sender, RoutedEventArgs e)
         {
             var selectedItem = Treeview.SelectedItem as TreeViewItem;
-            if (selectedItem == null)
+            var manualValue = ManualValue.Text;
+            if (selectedItem == null && String.IsNullOrEmpty(manualValue))
                 return;
 
-            SelectedItem = selectedItem.Tag;
+            if (String.IsNullOrEmpty(manualValue))
+                SelectedItem = selectedItem.Tag;
+            else
+            {
+                if(manualValue.Length > 2)
+                {
+                    MessageBox.Show("Manual override must be 2 characters or less.");
+                    return;
+                }
+                SelectedItem = manualValue;
+                manualOverride = true;
+            }
+
             SaveResult = true;
             // get selected item
             Close();

@@ -1,13 +1,18 @@
-﻿using AAMFileNamingCore.Util;
+﻿using AAMFileNamingCore.UI;
+using AAMFileNamingCore.Util;
+using HandyControl.Controls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Media;
+using MessageBox = System.Windows.MessageBox;
 
 namespace AAMFileNamingCore.DataModel
 {
@@ -18,10 +23,6 @@ namespace AAMFileNamingCore.DataModel
         // volume / building	-	level	-	type	-	role	-	type code	drawing serial no.	_	short description (optional)
 
         private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
-        public string Name => System.IO.Path.GetFileNameWithoutExtension(Path);
-        public string Path { get; set; }
-        public string Extension => System.IO.Path.GetExtension(Path);
-        public string NewNameIso => $"{ProjectNumber}-{Originator}-{Volume}-{LevelString}-{DocumentTypeString}-{RoleString}-{TypeCodeString}{DrawingSerialNo}{CreateSeparator(Description, "_")}{Description}";
 
         private object CreateSeparator(string description, string sep)
         {
@@ -31,10 +32,23 @@ namespace AAMFileNamingCore.DataModel
             return sep;
         }
 
-        public string NewNameNonIso => $"{ProjectNumber}_{FileCodeString}{CreateSeparator(DocumentTypeString, "_")}{DocumentTypeString}_{DateOfIssue}{CreateSeparator(Revision, "_")}{Revision}{CreateSeparator(Description, "_")}{Description}";
-        public string NewNameRootIso => $"{ProjectNumber}-{Originator}-{Volume}-{LevelString}-{DocumentTypeString}-{RoleString}-{TypeCodeString}-{Description}";
-        public string NewNameRootNonIso => $"{ProjectNumber}_{FileCodeString}_{DocumentTypeString}_{DateOfIssue}_{Revision}_{Description}";
         #region Properties
+
+        public string Name => System.IO.Path.GetFileNameWithoutExtension(Path);
+        public string Path { get; set; }
+        public string User => Environment.UserName.Substring(0, 2).ToUpper();
+        public string Extension => System.IO.Path.GetExtension(Path);
+        public string NewNameIso => $"{ProjectNumber}-{Originator}-{Volume}-{LevelString}-{DocumentTypeIsoString}-{RoleString}-{TypeCodeString}{DrawingSerialNo}{CreateSeparator(Description, "_")}{Description}";
+        public string NewNameNonIso => $"{ProjectNumber}_{FileCodeString}{CreateSeparator(DocumentTypeString, "_")}{DocumentTypeString}_{DateOfIssue}{CreateSeparator(Revision, "_")}{Revision}{CreateSeparator(Description, "_")}{Description}";
+        public string NewNameForComments => Name.ToLower().Contains("comment") ? Name : $"{Name}_{User}ForComments_{DateOfIssue}";
+        public string NewNameRootIso => $"{ProjectNumber}-{Originator}-{Volume}-{LevelString}-{DocumentTypeIsoString}-{RoleString}-{TypeCodeString}-{Description}";
+        public string NewNameRootNonIso => $"{ProjectNumber}_{FileCodeString}_{DocumentTypeIsoString}_{DateOfIssue}_{Revision}_{Description}";
+        public string NewNameRootForComments => $"{Name}_{User}ForComments_{DateOfIssue}";
+        public string NewPathIso => System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path), NewNameIso + Extension);
+        public string NewPathNonIso => System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path), NewNameNonIso + Extension);
+        public string NewPathForComments => System.IO.Path.Combine(System.IO.Path.GetDirectoryName(Path), NewNameForComments + Extension);
+
+        //NewNameForComments
 
         private string _projectNumber = "";
         public string ProjectNumber { get => _projectNumber; set => _projectNumber = value; }
@@ -68,23 +82,27 @@ namespace AAMFileNamingCore.DataModel
 
         private Level _level = Level.NoLevelApplicable;
         public Level Level { get => _level; set => _level = value; }
-        public string LevelString => NamingLists.GetAbbreviation(Level) ?? string.Empty;
+        public string LevelString => GetAbbreviation(typeof(Level)) ?? string.Empty;
 
+
+        private DocumentTypeIso _documentTypeIso = DocumentTypeIso.None;
+        public DocumentTypeIso DocumentTypeIso { get => _documentTypeIso; set => _documentTypeIso = value; }
+        public string DocumentTypeIsoString => GetAbbreviation(typeof(DocumentTypeIso)) ?? string.Empty;
+        
 
         private DocumentType _documentType = DocumentType.None;
         public DocumentType DocumentType { get => _documentType; set => _documentType = value; }
-        public string DocumentTypeString => NamingLists.GetAbbreviation(DocumentType) ?? string.Empty;
+        public string DocumentTypeString => GetAbbreviation(typeof(DocumentType)) ?? string.Empty;
 
 
         private Role _role = Role.Architecture;
         public Role Role { get => _role; set => _role = value; }
-        public string RoleString => NamingLists.GetAbbreviation(Role) ?? string.Empty;
+        public string RoleString => GetAbbreviation(typeof(Role)) ?? string.Empty;
 
 
         private TypeCode _typeCode = TypeCode.None;
         public TypeCode TypeCode { get => _typeCode; set => _typeCode = value; }
-        public string TypeCodeString => NamingLists.GetAbbreviation(TypeCode) ?? string.Empty;
-
+        public string TypeCodeString => GetAbbreviation(typeof(TypeCode)) ?? string.Empty;
 
         private string _drawingSerialNo = "";
         public string DrawingSerialNo
@@ -102,16 +120,19 @@ namespace AAMFileNamingCore.DataModel
         private string _dateOfIssue = "";
         public string DateOfIssue { get => _dateOfIssue; set => _dateOfIssue = value; }
 
+
         private FileCode _fileCode = FileCode.None;
         public FileCode FileCode { get => _fileCode; set => _fileCode = value; }
-
-        public string FileCodeString => NamingLists.GetAbbreviation(FileCode) ?? string.Empty;
+        public string FileCodeString => GetAbbreviation(typeof(FileCode)) ?? string.Empty;
 
 
         private FileType _fileType = FileType.None;
         public FileType FileType { get => _fileType; set => _fileType = value; }
+        public string FileTypeString => GetAbbreviation(typeof(FileType)) ?? string.Empty;
 
-        public string FileTypeString => NamingLists.GetAbbreviation(FileType) ?? string.Empty;
+
+        public Dictionary<Type, string> CustomProperties { get; set; } = new Dictionary<Type, string>();
+
         public Brush IndicatorColor => (Brush)new BrushConverter().ConvertFromString(ColorUtil.ExtensionToHex(Extension.ToLower()));
 
         #endregion
@@ -177,18 +198,157 @@ namespace AAMFileNamingCore.DataModel
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public void Rename(string newName)
+        public bool Rename(NamingProtocol protocol)
         {
+            string nameToSave = "";
+            string pathToSave = ""; 
+
+            if(protocol == NamingProtocol.Iso19650)
+            {
+                nameToSave = NewNameIso;
+                pathToSave = NewPathIso;
+            }
+            else if(protocol == NamingProtocol.NonIso)
+            {
+                nameToSave = NewNameNonIso;
+                pathToSave = NewPathNonIso;
+            }
+            else if (protocol == NamingProtocol.ForComments)
+            {
+                nameToSave = NewNameForComments;
+                pathToSave = NewPathForComments;
+            }
+
+            // try to rename the file
+            try
+            {
+                System.IO.File.Move(Path, pathToSave);
+                Logger.Info($"File renamed from {Name} to {nameToSave} using protocol : {protocol.ToString()}");
+                this.Path = pathToSave;
+                OnPropertyChanged(nameof(Path));
+                OnPropertyChanged(nameof(Name));
+                return true;
+            }
+
+            catch (IOException ex) when (ex.HResult == -2146232800) // File already exists
+            {
+                // ask to rename to (1) or (2) or (3) etc
+                Logger.Warn($"File already exists: {ex.Message}");
+                var res = MessageBox.Show("The file exists. Do you want to add a timestamp to avoid overwriting the file?", nameToSave, MessageBoxButton.OKCancel, MessageBoxImage.Warning);
+
+                if (res == MessageBoxResult.OK)
+                {
+                    // add a timestamp
+                    string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+                    
+                    Description = $"{Description}{timestamp}";
+                    OnPropertyChanged(nameof(Description));
+
+                    try
+                    {
+                        System.IO.File.Move(Path, pathToSave);
+                        Logger.Info($"File renamed from {Name} to {nameToSave} using protocol :  {protocol.ToString()}");
+
+                        OnPropertyChanged(nameof(Name));
+                        OnPropertyChanged(nameof(Path));
+
+                        return true;
+                    }
+                    catch (Exception e)
+                    {
+                        Logger.Error($"Error renaming file: {e.Message}");
+                        MessageBox.Show($"Error renaming file: {e.Message}");
+                        return false;
+                    }
+                }
+
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                MessageBox.Show($"Unauthorized access: {ex.Message}");
+                Logger.Error($"Unauthorized access: {ex.Message}");
+                return false;
+            }
+            catch (PathTooLongException ex)
+            {
+                MessageBox.Show($"Path too long: {ex.Message}");
+                Logger.Error($"Path too long: {ex.Message}");
+                return false;
+            }
+            catch (DirectoryNotFoundException ex)
+            {
+                MessageBox.Show($"Directory not found: {ex.Message}");
+                Logger.Error($"Directory not found: {ex.Message}");
+                return false;
+            }
+            catch (NotSupportedException ex)
+            {
+                MessageBox.Show($"Not supported: {ex.Message}");
+                Logger.Error($"Not supported: {ex.Message}");
+                return false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error: {ex.Message}");
+                Logger.Error($"Error: {ex.Message}");
+                return false;
+            }
+
+            return true;
         }
 
-        public void Reset()
+        public void UpdateValue(DataInput dataInput)
         {
+            // if input is manual override, then 
+            if (dataInput.manualOverride)
+            {
+                string s = dataInput?.SelectedItem as string;
+                s = s?.Trim().ToUpper();
+                SetCustomProperty(dataInput.inputType, s);
+
+            }
+            else
+            {
+                RemoveCustomProperty(dataInput.inputType);
+                UpdateValue(dataInput.inputType, dataInput.SelectedItem);
+            }
         }
 
-        public void Save(bool iso)
+        private void SetCustomProperty(Type inputType, string selectedItem)
         {
-            string nameToSave = iso ? NewNameIso : NewNameNonIso;
-            Logger.Info($"Saving file name, old name {Name}, new name : {nameToSave}, path : {Path}");
+            if (CustomProperties.ContainsKey(inputType))
+            {
+                CustomProperties[inputType] = selectedItem;
+            }
+            else
+            {
+                CustomProperties.Add(inputType, selectedItem);
+            }
+
+            var prop = GetPropertyFromType(inputType);
+
+            OnPropertyChanged(prop.Name);
+            if (prop.PropertyType != typeof(string))
+            {
+                try
+                {
+                    OnPropertyChanged(prop.Name + "String");
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+            }
+            OnPropertyChanged(nameof(NewNameIso));
+            OnPropertyChanged(nameof(NewNameNonIso));
+        }
+
+        private void RemoveCustomProperty(Type type)
+        {
+            if (CustomProperties.ContainsKey(type))
+            {
+                CustomProperties.Remove(type);
+            }
         }
 
         public void UpdateValue(Type type, object value)
@@ -224,6 +384,17 @@ namespace AAMFileNamingCore.DataModel
             }
             OnPropertyChanged(nameof(NewNameIso));
             OnPropertyChanged(nameof(NewNameNonIso));
+        }
+
+        private string? GetAbbreviation(Type type)
+        {
+            if(CustomProperties.ContainsKey(type))
+            {
+                return CustomProperties[type];
+            }
+
+            var prop = GetPropertyFromType(type);
+            return NamingLists.GetAbbreviation(prop.GetValue(this)) ?? string.Empty;
         }
 
         private PropertyInfo GetPropertyFromType(Type type)

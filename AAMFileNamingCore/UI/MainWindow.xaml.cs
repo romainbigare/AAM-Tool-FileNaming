@@ -13,14 +13,15 @@ namespace AAMFileNamingCore.UI
     public partial class MainWindow : Window
     {
         public Controller Controller { get; set; }
-        public DebounceHelper Debouncer { get; set; } = new DebounceHelper(100);
+        public DebounceHelper DebouncerFast { get; set; } = new DebounceHelper(100);
+        public DebounceHelper DebouncerSlow { get; set; } = new DebounceHelper(1200);
 
         public MainWindow(string folderPath)
         {
             InitializeComponent();
             Controller = new Controller(this, folderPath);
             DataContext = this;
-            ToolTipService.SetInitialShowDelay(this, 200); // Adjust as needed
+            ToolTipService.SetInitialShowDelay(this, 20); // Adjust as needed
         }
 
         private void BrowseFolderButton_Click(object sender, RoutedEventArgs e)
@@ -73,9 +74,11 @@ namespace AAMFileNamingCore.UI
             if (textBox == null)
                 return;
 
-            Debouncer.Debounce(() =>
+            var selection = Controller?.GetGridSelection();
+
+            Action<bool> applyInputAction = (bool isSlowDebounce) =>
             {
-                Dispatcher.Invoke(() =>
+                this.Dispatcher.Invoke(() => 
                 {
                     var tag = textBox.Tag;
                     var text = textBox.Text;
@@ -88,10 +91,10 @@ namespace AAMFileNamingCore.UI
                             textBox.BorderBrush = new LinearGradientBrush()
                             {
                                 GradientStops = new GradientStopCollection()
-                                    {
-                                        new GradientStop(Colors.IndianRed, 0),
-                                        new GradientStop(Colors.IndianRed, 1)
-                                    }
+                            {
+                                new GradientStop(Colors.IndianRed, 0),
+                                new GradientStop(Colors.IndianRed, 1)
+                            }
                             };
                         }
                         else
@@ -100,17 +103,23 @@ namespace AAMFileNamingCore.UI
                             textBox.BorderBrush = new LinearGradientBrush()
                             {
                                 GradientStops = new GradientStopCollection()
-                                    {
-                                        new GradientStop(Colors.LightGray, 0),
-                                        new GradientStop(Colors.LightGray, 1)
-                                    }
+                            {
+                                new GradientStop(Colors.LightGray, 0),
+                                new GradientStop(Colors.LightGray, 1)
+                            }
                             };
 
-                            Controller?.ApplyInput(text, textBox);
+                            Controller?.ApplyInput(text, textBox, selection);
                         }
                     }
                 });
-            });
+            };
+
+            if (textBox.Tag.ToString().ToLower().Contains("description"))
+                DebouncerSlow.Debounce(() => applyInputAction(true));
+
+            else
+                DebouncerFast.Debounce(() => applyInputAction(false));
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)

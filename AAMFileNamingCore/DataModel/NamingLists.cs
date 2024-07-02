@@ -38,7 +38,43 @@ namespace AAMFileNamingCore.DataModel
         }
     }
 
+    public class CustomNamingProperty
+    {
+        public Type Type { get; set; }
+
+        public string Abbreviation { get; set; }
+
+        public CustomNamingProperty(Type type, string abbreviation)
+        {
+            Type = type;
+            Abbreviation = abbreviation;
+        }
+    }
+
     public enum DocumentType
+    {
+        [Abbreviation("")]
+        [EnglishName("None")]
+        None, 
+
+        [Abbreviation("L")]
+        [EnglishName("Letter")]
+        Letter,
+
+        [Abbreviation("A")]
+        [EnglishName("Agenda")]
+        Agenda,
+
+        [Abbreviation("M")]
+        [EnglishName("Minutes")]
+        Minutes,
+
+        [Abbreviation("PR")]
+        [EnglishName("Publicity")]
+        Publicity,
+    }
+
+    public enum DocumentTypeIso
     {
         [Abbreviation("")]
         [EnglishName("None")]
@@ -126,7 +162,10 @@ namespace AAMFileNamingCore.DataModel
         Tracker,
         [Abbreviation("VS")]
         [EnglishName("Visualisation")]
-        Visualisation
+        Visualisation,
+
+        [EnglishName("Custom")]
+        Custom,
     }
 
     public enum Level
@@ -320,7 +359,10 @@ namespace AAMFileNamingCore.DataModel
         Level54,
         [Abbreviation("55")]
         [EnglishName("Level 55")]
-        Level55
+        Level55,
+
+        [EnglishName("Custom")]
+        Custom,
     }
 
     public enum TypeCode
@@ -445,7 +487,10 @@ namespace AAMFileNamingCore.DataModel
         [Abbreviation("90")]
         [Category("External")]
         [EnglishName("External Works (EXW)")]
-        ExternalWorksEXW
+        ExternalWorksEXW,
+
+        [EnglishName("Custom")]
+        Custom,
     }
 
     public enum FileCode
@@ -457,920 +502,917 @@ namespace AAMFileNamingCore.DataModel
 
 
         [Abbreviation("SK")]
-        [Category("Miscellaneous")]
         [EnglishName("Sketch (can be a CAD file, hand sketch, diagram, or other)")]
         Sketch,
 
         [Abbreviation("PR")]
-        [Category("Miscellaneous")]
         [EnglishName("Press Release")]
         PressRelease,
 
         [Abbreviation("TR")]
-        [Category("Miscellaneous")]
         [EnglishName("Tracking Log")]
         TrackingLog,
 
         [Abbreviation("DIR")]
-        [Category("Miscellaneous")]
         [EnglishName("Document Issue Register")]
         DocumentIssueRegister,
 
         [Abbreviation("DIS")]
-        [Category("Miscellaneous")]
         [EnglishName("Document Issue Sheet")]
         DocumentIssueSheet,
 
         [Abbreviation("R")]
-        [Category("Graphics")]
         [EnglishName("Report to be printed or read on screen")]
         Report,
 
         [Abbreviation("P")]
-        [Category("Graphics")]
         [EnglishName("Presentation, Slides for a meeting or talk. Also includes Videos.")]
         Presentation,
 
         [Abbreviation("00X")]
-        [Category("00 - Documents for Internal Circulation")]
+        [Category("Documents for Internal Circulation")]
         [EnglishName("Documents created for Internal Circulation")]
         DocumentForInternalCirculation,
 
-        // 01 - Documents related to the CLIENT
+        // Documents related to the CLIENT
         [Abbreviation("01A")]
-        [Category("01 - Documents related to the CLIENT")]
+        [Category("Documents related to the CLIENT")]
         [EnglishName("Documents related to the Clients Agent")]
         ClientAgent,
 
         [Abbreviation("01B")]
-        [Category("01 - Documents related to the CLIENT")]
+        [Category("Documents related to the CLIENT")]
         [EnglishName("Client brief and related documents")]
         ClientBrief,
 
         [Abbreviation("01C")]
-        [Category("01 - Documents related to the CLIENT")]
+        [Category("Documents related to the CLIENT")]
         [EnglishName("Client Correspondence (except fee letters)")]
         ClientCorrespondence,
 
         [Abbreviation("01CR")]
-        [Category("01 - Documents related to the CLIENT")]
+        [Category("Documents related to the CLIENT")]
         [EnglishName("Client Change Request")]
         ClientChangeRequest,
 
         [Abbreviation("01D")]
-        [Category("01 - Documents related to the CLIENT")]
+        [Category("Documents related to the CLIENT")]
         [EnglishName("Other Client documents")]
         OtherClientDocuments,
 
         [Abbreviation("01F")]
-        [Category("01 - Documents related to the CLIENT")]
+        [Category("Documents related to the CLIENT")]
         [EnglishName("Fee letters, appointments and other related documents")]
         FeeLettersAndAppointments,
 
-        // 02 - Documents related to the DESIGN
+        // Documents related to the DESIGN
         [Abbreviation("02DEL")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("Project Deliverables")]
         ProjectDeliverables,
 
         [Abbreviation("02DN")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("Design Notes")]
         DesignNotes,
 
         [Abbreviation("02PR")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("Programmes")]
         Programmes,
 
         [Abbreviation("02R")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("Design Risks / Risk Registers")]
         DesignRisks,
 
         [Abbreviation("02RE")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("Research")]
         Research,
 
         [Abbreviation("02REP")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("Reports")]
         Reports,
 
         [Abbreviation("02QA")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("All Schedules (Areas, Doors, etc).")]
         Schedules,
 
         [Abbreviation("02RF")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("Reference or Precedent Documents and Images")]
         ReferenceDocuments,
 
         [Abbreviation("02SI")]
-        [Category("02 - Documents related to the DESIGN")]
+        [Category("Documents related to the DESIGN")]
         [EnglishName("Documents and Images related to the Site / Site Visits.")]
         SiteDocuments,
 
-        // 03 - Documents related to COMPLIANCE
+        // Documents related to COMPLIANCE
         [Abbreviation("03BR")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Building Regulations")]
         BuildingRegulations,
 
         [Abbreviation("03EA")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Environmental Agency Compliance")]
         EnvironmentalAgencyCompliance,
 
         [Abbreviation("03EI")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Environmental Impact Compliance")]
         EnvironmentalImpactCompliance,
 
         [Abbreviation("03LDA")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to London Development Agency Compliance")]
         LondonDevelopmentAgencyCompliance,
 
         [Abbreviation("03HS")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("CDM - Health and Safety")]
         HealthAndSafety,
 
         [Abbreviation("03PC")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Public Consultations")]
         PublicConsultations,
 
         [Abbreviation("03PD")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("CDM - Principal Designer")]
         PrincipalDesigner,
 
         [Abbreviation("03PL")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Planning Compliance")]
         PlanningCompliance,
 
         [Abbreviation("03PW")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Party Wall Compliance")]
         PartyWallCompliance,
 
         [Abbreviation("03RL")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Rights To Light Compliance")]
         RightsToLightCompliance,
 
         [Abbreviation("03RP")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Royal Parks Authority Compliance")]
         RoyalParksAuthorityCompliance,
 
         [Abbreviation("03TP")]
-        [Category("03 - Documents related to COMPLIANCE")]
+        [Category("Documents related to COMPLIANCE")]
         [EnglishName("Documents related to Tree Protection Compliance")]
         TreeProtectionCompliance,
 
-        // 04 - Document related to the QUANTITY SURVEYOR / COSTS
+        // Document related to the QUANTITY SURVEYOR / COSTS
         [Abbreviation("04C")]
-        [Category("04 - Document related to the QUANTITY SURVEYOR / COSTS")]
+        [Category("Document related to the QUANTITY SURVEYOR / COSTS")]
         [EnglishName("Letters to Cost Consultant / Quantity Surveyor")]
         LettersToCostConsultant,
 
         [Abbreviation("04QS")]
-        [Category("04 - Document related to the QUANTITY SURVEYOR / COSTS")]
+        [Category("Document related to the QUANTITY SURVEYOR / COSTS")]
         [EnglishName("Documents related to Costs / Quantities")]
         CostsAndQuantities,
 
         [Abbreviation("04M")]
-        [Category("04 - Document related to the QUANTITY SURVEYOR / COSTS")]
+        [Category("Document related to the QUANTITY SURVEYOR / COSTS")]
         [EnglishName("Meetings related to Costs / Quantities.")]
         CostMeetings,
 
-        // 05 - Documents related to the STRUCTURAL DESIGN or ENGINEER
+        // Documents related to the STRUCTURAL DESIGN or ENGINEER
         [Abbreviation("05C")]
-        [Category("05 - Documents related to the STRUCTURAL DESIGN or ENGINEER")]
+        [Category("Documents related to the STRUCTURAL DESIGN or ENGINEER")]
         [EnglishName("Letters to the Structural Engineer")]
         LettersToStructuralEngineer,
 
         [Abbreviation("05SE")]
-        [Category("05 - Documents related to the STRUCTURAL DESIGN or ENGINEER")]
+        [Category("Documents related to the STRUCTURAL DESIGN or ENGINEER")]
         [EnglishName("Documents related to Structural Engineering")]
         StructuralEngineering,
 
-        // 06 - Document related to the SERVICES DESIGN or ENGINEER
+        // Document related to the SERVICES DESIGN or ENGINEER
         [Abbreviation("06C")]
-        [Category("06 - Document related to the SERVICES DESIGN or ENGINEER")]
+        [Category("Document related to the SERVICES DESIGN or ENGINEER")]
         [EnglishName("Letters to the Services Engineer")]
         LettersToServicesEngineer,
 
         [Abbreviation("06MEP")]
-        [Category("06 - Document related to the SERVICES DESIGN or ENGINEER")]
+        [Category("Document related to the SERVICES DESIGN or ENGINEER")]
         [EnglishName("Documents related to Services Engineering")]
         ServicesEngineering,
 
-        // 07 - Documents related to SPECIALISTS and SPECIALIST AREAS
+        // Documents related to SPECIALISTS and SPECIALIST AREAS
         [Abbreviation("07106")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Section 106 Agreement / Consultant")]
         Section106,
 
         [Abbreviation("07AA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Adjacent Site Architects")]
         AdjacentSiteArchitects,
 
         [Abbreviation("07AC")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Acoustic Design / Consultant")]
         AcousticDesign,
 
         [Abbreviation("07ACC")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Access Design / Consultant")]
         AccessDesign,
 
         [Abbreviation("07AO")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Adjoining Owners Agent")]
         AdjoiningOwnersAgent,
 
         [Abbreviation("07AR")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Art Consultant")]
         ArtConsultant,
 
         [Abbreviation("07ARB")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Tree Specialist")]
         TreeSpecialist,
 
         [Abbreviation("07ARC")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Archaeology / the Archaeologist")]
         Archaeology,
 
         [Abbreviation("07AS")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Asbestos Strategy / Surveyor")]
         AsbestosStrategy,
 
         [Abbreviation("07AV")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Audio Visual Design / Consultant")]
         AudioVisualDesign,
 
         [Abbreviation("07BIM")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to BIM or BIM Managers / Consultants")]
         BIM,
 
         [Abbreviation("07BR")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to BREEAM / BREEAM Consultants")]
         BREEAM,
 
         [Abbreviation("07C20")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Twentieth Century Society")]
         TwentiethCenturySociety,
 
         [Abbreviation("07CA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Catering Strategy / Specialist")]
         CateringStrategy,
 
         [Abbreviation("07CE")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Civil Design / Engineer")]
         CivilDesign,
 
         [Abbreviation("07CL")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Cladding Consultant")]
         CladdingConsultant,
 
         [Abbreviation("07CLP")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Clinic Planner")]
         ClinicPlanner,
 
         [Abbreviation("07CM")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Computer Modeller")]
         ComputerModeller,
 
         [Abbreviation("07CMM")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Comms. Design / Consultant")]
         CommsDesign,
 
         [Abbreviation("07CO")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Conservation Strategy / Specialist")]
         ConservationStrategy,
 
         [Abbreviation("07CP")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Construction Programmer")]
         ConstructionProgrammer,
 
         [Abbreviation("07CS")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Building Conditions / the Conditions Surveyor")]
         BuildingConditions,
 
         [Abbreviation("07CT")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Coatings / the Coatings Specialist")]
         Coatings,
 
         [Abbreviation("07CW")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Clerk Of Works")]
         ClerkOfWorks,
 
         [Abbreviation("07DR")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Drainage Strategy / Specialist")]
         DrainageStrategy,
 
         [Abbreviation("07DS")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Daylight Sunlight / Specialist")]
         DaylightSunlight,
 
         [Abbreviation("07EC")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Environmental Strategy / Consultant")]
         EnvironmentalStrategy,
 
         [Abbreviation("07EL")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Electrical Services Design / Consultant")]
         ElectricalServicesDesign,
 
         [Abbreviation("07EOD")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Explosive Ordnance Disposal")]
         ExplosiveOrdnanceDisposal,
 
         [Abbreviation("07EX")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Exhibition Design / Designer")]
         ExhibitionDesign,
 
         [Abbreviation("07FA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Facade Design / Specialist")]
         FacadeDesign,
 
         [Abbreviation("07FL")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Flood Design / Consultant")]
         FloodDesign,
 
         [Abbreviation("07FO")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Fit-Out Design / Specialist")]
         FitOutDesign,
 
         [Abbreviation("07FR")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Fire Strategy / Consultant")]
         FireStrategy,
 
         [Abbreviation("07FRA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Flood Risk Strategy / Assessor")]
         FloodRiskStrategy,
 
         [Abbreviation("07FU")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Funding / the Funding Agent")]
         Funding,
 
         [Abbreviation("07GD")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Graphic Designer")]
         GraphicDesigner,
 
         [Abbreviation("07GS")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Geotechnical Design / Specialist")]
         GeotechnicalDesign,
 
         [Abbreviation("07HI")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Historian")]
         Historian,
 
         [Abbreviation("07HO")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Hospitality Strategy / Consultants")]
         HospitalityStrategy,
 
         [Abbreviation("07HP")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Healthcare Strategy / Planner")]
         HealthcareStrategy,
 
         [Abbreviation("07HT")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Hotel Design / Specialists")]
         HotelDesign,
 
         [Abbreviation("07HW")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Highways Strategy / Consultant")]
         HighwaysStrategy,
 
         [Abbreviation("07HZ")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Hazardous Materials / Surveyor")]
         HazardousMaterials,
 
         [Abbreviation("07IB")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Insurance / the Insurance Broker")]
         Insurance,
 
         [Abbreviation("07ID")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Interior Design / Designer")]
         InteriorDesign,
 
         [Abbreviation("07INT")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Interpreter - Translator")]
         Interpreter,
 
         [Abbreviation("07IT")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the IT Strategy / Specialist")]
         ITStrategy,
 
         [Abbreviation("07KT")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Kitchen Design / Specialist")]
         KitchenDesign,
 
         [Abbreviation("07LA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Landscape Design / Architect")]
         LandscapeDesign,
 
         [Abbreviation("07LF")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Lift Strategy / Consultant")]
         LiftStrategy,
 
         [Abbreviation("07LG")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Local Interest Groups")]
         LocalInterestGroups,
 
         [Abbreviation("07LI")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Lighting Design / Consultant")]
         LightingDesign,
 
         [Abbreviation("07LM")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Landscape Manager")]
         LandscapeManager,
 
         [Abbreviation("07LO")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Landowner")]
         Landowner,
 
         [Abbreviation("07LR")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Local Residents")]
         LocalResidents,
 
         [Abbreviation("07LW")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Legal Agent")]
         LegalAgent,
 
         [Abbreviation("07MA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Maintenance + Acccess Strategy / Specialist")]
         MaintenanceAccessStrategy,
 
         [Abbreviation("07MA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Masterplanners")]
         Masterplanners,
 
         [Abbreviation("07MAS")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Masonry Design / Specialist")]
         MasonryDesign,
 
         [Abbreviation("07MET")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Metallurgist")]
         Metallurgist,
 
         [Abbreviation("07MM")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Modelmaking / the Modelmakers")]
         Modelmaking,
 
         [Abbreviation("07MP")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Model Photographer")]
         ModelPhotographer,
 
         [Abbreviation("07MT")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Model Transporter")]
         ModelTransporter,
 
         [Abbreviation("07OA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Office Agent")]
         OfficeAgent,
 
         [Abbreviation("07OM")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the O&M Manual Specialist")]
         OMManualSpecialist,
 
         [Abbreviation("07PA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Perspective Artist")]
         PerspectiveArtist,
 
         [Abbreviation("07PF")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to People Flow (Crowd Planning) / Consultant")]
         PeopleFlow,
 
         [Abbreviation("07PH")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Photography / the Photographer")]
         Photography,
 
         [Abbreviation("07PHC")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Public Health Strategy / Consultant")]
         PublicHealthStrategy,
 
         [Abbreviation("07PL")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Planning / the Planning Consultant")]
         Planning,
 
         [Abbreviation("07PR")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Public Relations")]
         PublicRelations,
 
         [Abbreviation("07PRC")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Property Consultant")]
         PropertyConsultant,
 
         [Abbreviation("07PRM")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Property Manager")]
         PropertyManager,
 
         [Abbreviation("07PV")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Photovoltaics")]
         Photovoltaics,
 
         [Abbreviation("07PW")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Party Wall Strategy / Surveyor")]
         PartyWallStrategy,
 
         [Abbreviation("07RA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Retail Agent")]
         RetailAgent,
 
         [Abbreviation("07RC")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Retail Consultant")]
         RetailConsultant,
 
         [Abbreviation("07RESA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Residential Agent")]
         ResidentialAgent,
 
         [Abbreviation("07RI")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Risk Consultant")]
         RiskConsultant,
 
         [Abbreviation("07RL")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Rights To Light Surveyor")]
         RightsToLightSurveyor,
 
         [Abbreviation("07SE")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Security Strategy / Consultant")]
         SecurityStrategy,
 
         [Abbreviation("07SG")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Solar Glare Specialist")]
         SolarGlareSpecialist,
 
         [Abbreviation("07SP")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Space Planning / the Space Planners")]
         SpacePlanning,
 
         [Abbreviation("07ST")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Studio Specialist")]
         StudioSpecialist,
 
         [Abbreviation("07SU")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Surveys / the Surveyor")]
         Surveys,
 
         [Abbreviation("07SUS")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Sustainability Strategy / Consultant")]
         SustainabilityStrategy,
 
         [Abbreviation("07TH")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Theatre Design / Consultant")]
         TheatreDesign,
 
         [Abbreviation("07TN")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Townscape Strategy / Consultant")]
         TownscapeStrategy,
 
         [Abbreviation("07TR")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Traffic or Transport Strategy / Consultant")]
         TransportStrategy,
 
         [Abbreviation("07UD")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Urban Designer")]
         UrbanDesigner,
 
         [Abbreviation("07VIS")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to Visualisation / the Visualisation Consultant")]
         Visualisation,
 
         [Abbreviation("07WC")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Wind Strategy / Consultant")]
         WindStrategy,
 
         [Abbreviation("07WF")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Wayfinding Design / Consultant")]
         WayfindingDesign,
 
         [Abbreviation("07WR")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Waste And Recycling Strategy / Specialist")]
         WasteAndRecyclingStrategy,
 
         [Abbreviation("07XA")]
-        [Category("07 - Documents related to SPECIALISTS and SPECIALIST AREAS")]
+        [Category("Documents related to SPECIALISTS and SPECIALIST AREAS")]
         [EnglishName("Documents related to the Executive Architect")]
         ExecutiveArchitect,
 
-        // 08 - Documents related to the Design / Project TEAM
+        // Documents related to the Design / Project TEAM
         [Abbreviation("08C")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Letters to the Design / Project Team")]
         LettersToDesignTeam,
 
         [Abbreviation("08CA")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Consultants Appointments and related Documents")]
         ConsultantAppointments,
 
         [Abbreviation("08CC")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Documents related to Change Control")]
         ChangeControl,
 
         [Abbreviation("08DT")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Documents related to the Design Team")]
         DesignTeam,
 
         [Abbreviation("08MD")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Design Team Meetings (e.g Agendas, Minutes)")]
         DesignTeamMeetings,
 
         [Abbreviation("08PD")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Project Directory and related Documents")]
         ProjectDirectory,
 
         [Abbreviation("08PM")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Documents related to the Project Management")]
         ProjectManagement,
 
         [Abbreviation("08PR")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Team Programme and related Documents")]
         TeamProgramme,
 
         [Abbreviation("08MP")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Project Team Meetings (e.g Agendas, Minutes)")]
         ProjectTeamMeetings,
 
         [Abbreviation("08PT")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Documents related to the Project Team")]
         ProjectTeam,
 
         [Abbreviation("08RM")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Responsibility Matrix and related Documents")]
         ResponsibilityMatrix,
 
         [Abbreviation("08SC")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Documents related to Subconsultants")]
         Subconsultants,
 
         [Abbreviation("08VE")]
-        [Category("08 - Documents related to the Design / Project TEAM")]
+        [Category("Documents related to the Design / Project TEAM")]
         [EnglishName("Documents related to Value Engineering")]
         ValueEngineering,
 
-        // 09 - Documents related to the TECHNICAL Design
+        // Documents related to the TECHNICAL Design
         [Abbreviation("09AMT")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the AMT package")]
         AMTPackage,
 
         [Abbreviation("09CLG")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the CLG package")]
         CLGPackage,
 
         [Abbreviation("09EES")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the EES package")]
         EESPackage,
 
         [Abbreviation("09EXW")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the EXW package")]
         EXWPackage,
 
         [Abbreviation("09FFE")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the FFE package")]
         FFEPackage,
 
         [Abbreviation("09FIN")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the FIN package")]
         FINPackage,
 
         [Abbreviation("09FLS")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the FLS package")]
         FLSPackage,
 
         [Abbreviation("09FPS")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the FPS package")]
         FPSPackage,
 
         [Abbreviation("09IDR")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the IDR package")]
         IDRPackage,
 
         [Abbreviation("09ILP")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the ILP package")]
         ILPPackage,
 
         [Abbreviation("09IPS")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the IPS package")]
         IPSPackage,
 
         [Abbreviation("09ITW")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the ITW package")]
         ITWPackage,
 
         [Abbreviation("09JNY")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the JNY package")]
         JNYPackage,
 
         [Abbreviation("09KIT")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the KIT package")]
         KITPackage,
 
         [Abbreviation("09MAE")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the MAE package")]
         MAEPackage,
 
         [Abbreviation("09RFS")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the RFS package")]
         RFSPackage,
 
         [Abbreviation("09SAN")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the SAN package")]
         SANPackage,
 
         [Abbreviation("09SCR")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the SCR package")]
         SCRPackage,
 
         [Abbreviation("09SGN")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the SGN package")]
         SGNPackage,
 
         [Abbreviation("09TD")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents created by the project Technical Director")]
         TechnicalDirector,
 
         [Abbreviation("09USD")]
-        [Category("09 - Documents related to the TECHNICAL Design")]
+        [Category("Documents related to the TECHNICAL Design")]
         [EnglishName("Documents related to the USD package")]
         USDPackage,
 
         // 12 - Documents related to the MAIN CONTRACTOR
         [Abbreviation("12C")]
-        [Category("12 - Documents related to the MAIN CONTRACTOR")]
+        [Category("Documents related to the MAIN CONTRACTOR")]
         [EnglishName("Letters to a Main Contractor")]
         LettersToMainContractor,
 
         [Abbreviation("12SR")]
-        [Category("12 - Documents related to the MAIN CONTRACTOR")]
+        [Category("Documents related to the MAIN CONTRACTOR")]
         [EnglishName("Site Visits and Reports")]
         SiteVisitsAndReports,
 
         [Abbreviation("12RFI")]
-        [Category("12 - Documents related to the MAIN CONTRACTOR")]
+        [Category("Documents related to the MAIN CONTRACTOR")]
         [EnglishName("RFIs and related Documents")]
         RFIs,
 
         [Abbreviation("12CN")]
-        [Category("12 - Documents related to the MAIN CONTRACTOR")]
+        [Category("Documents related to the MAIN CONTRACTOR")]
         [EnglishName("All other documents related to a Main Contractor")]
         OtherMainContractorDocuments,
 
         // 13 - Documents related to SPECIALIST CONTRACTORS
         [Abbreviation("13CD")]
-        [Category("13 - Documents related to SPECIALIST CONTRACTORS")]
+        [Category("Documents related to SPECIALIST CONTRACTORS")]
         [EnglishName("Documents related to Contractor Design")]
         ContractorDesign,
 
         [Abbreviation("13DM")]
-        [Category("13 - Documents related to SPECIALIST CONTRACTORS")]
+        [Category("Documents related to SPECIALIST CONTRACTORS")]
         [EnglishName("Documents related to the Demolition and Strip-Out Contractor")]
         DemolitionContractor,
 
         [Abbreviation("13EW")]
-        [Category("13 - Documents related to SPECIALIST CONTRACTORS")]
+        [Category("Documents related to SPECIALIST CONTRACTORS")]
         [EnglishName("Documents related to the Enabling Works Contractor")]
         EnablingWorksContractor,
 
         [Abbreviation("13FO")]
-        [Category("13 - Documents related to SPECIALIST CONTRACTORS")]
+        [Category("Documents related to SPECIALIST CONTRACTORS")]
         [EnglishName("Documents related to the Fit-Out Contractor")]
         FitOutContractor,
 
         [Abbreviation("13TC")]
-        [Category("13 - Documents related to SPECIALIST CONTRACTORS")]
+        [Category("Documents related to SPECIALIST CONTRACTORS")]
         [EnglishName("Documents related to Trade Contractors")]
-        TradeContractors
+        TradeContractors,
+
+
+        [EnglishName("Custom")]
+        Custom,
     }
 
     public enum Role
@@ -1389,7 +1431,10 @@ namespace AAMFileNamingCore.DataModel
 
         [Abbreviation("PD")]
         [EnglishName("Principal Designer")]
-        PrincipalDesigner
+        PrincipalDesigner,
+
+        [EnglishName("Custom")]
+        Custom,
     }
 
     public enum FileType
@@ -1419,6 +1464,9 @@ namespace AAMFileNamingCore.DataModel
         [Category("Publicity")]
         [EnglishName("Publicity")]
         Publicity,
+
+        [EnglishName("Custom")]
+        Custom,
     }
 
     public static class NamingLists
@@ -1456,19 +1504,30 @@ namespace AAMFileNamingCore.DataModel
             // and add children with enum values
             var values = Enum.GetValues(t);
             var treeViewItems = new List<TreeViewItem>();
+
+            if(t == typeof(DocumentTypeIso))
+                values = values.Cast<DocumentTypeIso>().OrderBy(x => GetAbbreviation(x)).ToArray();
+
             foreach (var value in values)
             {
                 var category = GetCategory(value);
                 var abbreviation = GetAbbreviation(value);
-                if(abbreviation == null) continue; // skip if abbreviation is null (not needed in treeview
-                if(String.IsNullOrEmpty(abbreviation)) continue; // skip if abbreviation is empty (not needed in treeview
+                //if(abbreviation == null) continue; // skip if abbreviation is null (not needed in treeview
+                //if(String.IsNullOrEmpty(abbreviation)) continue; // skip if abbreviation is empty (not needed in treeview
                 var englishName = GetEnglishName(value);
-                if (category != null)
+
+                // if custom, skip
+                if (englishName == "Custom") continue;
+
+
+                if (category != null && !String.IsNullOrEmpty(abbreviation))
                 {
-                    var categoryTreeViewItem = treeViewItems.FirstOrDefault(x => x.Header?.ToString()?.ToLower() == $"{abbreviation?.First()}X - {category}".ToLower());
+                    var header = abbreviation.Length > 2 ? $"{abbreviation?.Substring(0,2)}X - {category}" : $"{abbreviation?.First()}X - {category}";
+                    var categoryTreeViewItem = treeViewItems.FirstOrDefault(x => x.Header?.ToString()?.ToLower() == header.ToLower());
+                    
                     if (categoryTreeViewItem == null)
                     {
-                        categoryTreeViewItem = new TreeViewItem { Header = $"{abbreviation?.First()}X - {category}", Tag = value };
+                        categoryTreeViewItem = new TreeViewItem { Header = header, Tag = value };
                         treeViewItems.Add(categoryTreeViewItem);
                     }
 

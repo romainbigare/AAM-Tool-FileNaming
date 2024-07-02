@@ -8,12 +8,19 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using AAMFileNamingCore.DataModel;
+using AAMFileNaming.Shared.Logging;
 
 namespace AAMFileNamingCore.UI
 {
+    public enum NamingProtocol
+    {
+        Iso19650,
+        NonIso,
+        ForComments
+    }
+
     public class Controller : INotifyPropertyChanged
     {
-        private static readonly NLog.Logger Logger = NLog.LogManager.GetCurrentClassLogger();
         public Folder Folder { get; set; }
         public MainWindow UI { get; set; }
 
@@ -34,7 +41,7 @@ namespace AAMFileNamingCore.UI
 
         public void InitFolder(string folderPath)
         {
-            Logger.Info("Initializing folder");
+            AAMLogger.Info("Initializing folder");
             Folder = new Folder(UI.Dispatcher);
             if (folderPath != null)
                 SetFolder(folderPath, false, null);
@@ -97,7 +104,7 @@ namespace AAMFileNamingCore.UI
 
         public async void SetFolder(string? path, bool subfolders, List<string> filters = null)
         {
-            Logger.Info($"Setting folder to {path}, include subfolders : {subfolders}");
+            AAMLogger.Info($"Setting folder to {path}, include subfolders : {subfolders}");
 
             RefreshUILayout(isLoading: true);
             ProgressButtonInit();
@@ -105,6 +112,7 @@ namespace AAMFileNamingCore.UI
 
             try
             {
+
                 if (path != null)
                 {
                     var parts = path.Split("\\");
@@ -122,10 +130,10 @@ namespace AAMFileNamingCore.UI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                Logger.Error(ex, "Error while setting folder");
+                AAMLogger.Error(ex, "Error while setting folder");
             }
 
-            Logger.Info($"Folder set to {path}");
+            AAMLogger.Info($"Folder set to {path}");
             await ProgressButtonComplete();
             RefreshUILayout(isLoading: false);
             return;
@@ -155,21 +163,22 @@ namespace AAMFileNamingCore.UI
             {
                 // TO DO : Save the data to the controller
                 var selectedFiles = GetGridSelection();
-                Task.Run(() => SaveToSelected(input, dataInput.SelectedItem, selectedFiles?.ToList()));
+                Task.Run(() => SaveToSelected(dataInput, selectedFiles?.ToList()));
             }
         }
 
-        private void SaveToSelected(Type input, object selectedItem, List<File> selectedFiles)
+        private void SaveToSelected(DataInput dataInput, List<File> selectedFiles)
         {
             foreach (var file in selectedFiles)
             {
-                file.UpdateValue(input, selectedItem);
+                file.UpdateValue(dataInput);
             }
         }
 
-        private ICollection<File> GetGridSelection()
+        internal ICollection<File> GetGridSelection()
         {
-            if (GetCurrentPage().ToLower().Contains("19650"))
+            var prot = SelectedNamingProtocol();
+            if (prot == NamingProtocol.Iso19650)
             {
                 var sel = UI.DatagridIso.SelectedItems;
                 try
@@ -178,11 +187,11 @@ namespace AAMFileNamingCore.UI
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex, "Error while getting selected files");
+                    AAMLogger.Error(ex, "Error while getting selected files");
                     return new List<File>();
                 }
             }
-            else
+            else if( prot == NamingProtocol.NonIso)
             {
                 var sel = UI.DatagridNonIso.SelectedItems;
                 try
@@ -191,23 +200,49 @@ namespace AAMFileNamingCore.UI
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex, "Error while getting selected files");
+                    AAMLogger.Error(ex, "Error while getting selected files");
                     return new List<File>();
                 }
             }
+            else if(prot == NamingProtocol.ForComments)
+            {
+                var sel = UI.DatagridForComments.SelectedItems;
+                try
+                {
+                    return sel.Cast<File>().ToList();
+                }
+                catch (Exception ex)
+                {
+                    AAMLogger.Error(ex, "Error while getting selected files");
+                    return new List<File>();
+                }
+            }
+            else
+            {
+                return new List<File>();
+            }
         }
 
-        private string GetCurrentPage()
+        private NamingProtocol SelectedNamingProtocol()
         {
             var selected = UI.NamingProtocol?.SelectedItem;
             if (selected == null)
-                return "";
+                return NamingProtocol.Iso19650;
 
             var content = (selected as ComboBoxItem)?.Content;
             if (content == null)
-                return "";
+                return NamingProtocol.Iso19650;
 
-            return content.ToString();
+            var ct = content.ToString();
+            if(ct == null)
+                return NamingProtocol.Iso19650;
+
+            if(ct.Contains("19650"))
+                return NamingProtocol.Iso19650;
+            if(ct.ToLower().Contains("comment"))
+                return NamingProtocol.ForComments;  
+            else
+                return NamingProtocol.NonIso;
         }
 
         internal bool ValidateInput(string text, string tagString)
@@ -222,10 +257,9 @@ namespace AAMFileNamingCore.UI
                 return true;
         }
 
-        internal void ApplyInput(string text, TextBox textBox)
+        internal void ApplyInput(string text, TextBox textBox, ICollection<File> selectedFiles)
         {
             // find all selected row in current datagrid
-            var selectedFiles = GetGridSelection();
             var prop = textBox?.Tag?.ToString();
 
             if (selectedFiles.Count == 0 || prop == null)
@@ -246,12 +280,26 @@ namespace AAMFileNamingCore.UI
                 return;
             }
 
+            // split text by space
+            var parts = text.Split(" ");
+
+            // every first letter must be uppercase
+            for (int i = 0; i < parts.Length; i++)
+            {
+                if(parts[i].Length > 0)
+                    parts[i] = parts[i].First().ToString().ToUpper() + parts[i].Substring(1);
+            }
+
+            // join parts by space
+            text = string.Join("", parts);
+            text = text.Replace("_", "-");
+            text = text.Replace(".", "-");
+
             foreach (var file in selectedFiles)
             {
                 file.UpdateValue(prop, text);
             }
         }
-
 
         public async Task EnsureUniqueness(ICollection<File> selectedFiles = null)
         {
@@ -259,7 +307,7 @@ namespace AAMFileNamingCore.UI
             if (selectedFiles == null)
                 selectedFiles = GetGridSelection();
 
-            bool iso = GetCurrentPage().ToLower().Contains("19650");
+            bool iso = SelectedNamingProtocol() == NamingProtocol.Iso19650;
             try
             {
                 foreach (var file in selectedFiles)
@@ -269,36 +317,55 @@ namespace AAMFileNamingCore.UI
             }
             catch (Exception ex)
             {
-                Logger.Error(ex, "Error while ensuring uniqueness");
+                AAMLogger.Error(ex, "Error while ensuring uniqueness");
                 MessageBox.Show(ex.Message);
             }
-
-
         }
 
         internal void Save()
         {
             var selection = GetGridSelection();
-            bool iso = GetCurrentPage().Contains("19650");
+            var protocol = SelectedNamingProtocol();
+            bool iso = protocol == NamingProtocol.Iso19650;
+            bool forComments = protocol == NamingProtocol.ForComments;
 
             if (selection == null)
             {
-                Logger.Info("No files selected");
+                AAMLogger.Info("No files selected");
                 MessageBox.Show("No files selected");
                 return;
             }
 
-            foreach (var file in selection)
+            var newPathProp = iso ? "NewPathIso" : forComments ? "NewPathForComments" : "NewPathNonIso";
+            var filteredSelection = selection.Where(f => f.Path != f.GetType().GetProperty(newPathProp)?.GetValue(f)?.ToString()).ToList();
+            var grouped = filteredSelection.GroupBy(f => f.GetType().GetProperty(newPathProp)?.GetValue(f)?.ToString()).ToList();
+
+            foreach (var group in grouped)
             {
-                file.Save(iso);
+                if (group.Count() > 1)
+                {
+                    int i = 0;
+                    foreach (var file in group)
+                    {
+                        if(i>0)
+                            file.UpdateValue("Description", $"{file.GetType().GetProperty("Description")?.GetValue(file)?.ToString()} ({i})");
+                        
+                        i++;
+                    }
+                }
             }
 
-            Logger.Info($"{selection.Count} files renamed, in path {Folder.Path}");
+            var files = grouped.SelectMany(g => g).ToList();
 
-            // TO DO : CHECK UNIQUENESS OF FILENAMES
-            // TO DO : IMPLEMENT SAVE
-            // something 
-            MessageBox.Show("disabled for testing");
+            int count = 0;
+            foreach (var file in files)
+            {
+                if(file.Rename(protocol))
+                    count++;
+            }
+
+            MessageBox.Show($"{count} files renamed");
+
         }
 
         internal bool IncludeSubfolders()
@@ -353,20 +420,45 @@ namespace AAMFileNamingCore.UI
                     return;
                 }
 
-                var page = GetCurrentPage();
-                if (page.ToLower().Contains("19650"))
+                var protocol = SelectedNamingProtocol();
+                if (protocol == NamingProtocol.Iso19650)
                 {
                     UI.DatagridIso.Visibility = Visibility.Visible;
                     UI.DatagridNonIso.Visibility = Visibility.Collapsed;
                     UI.NoFileWarning.Visibility = Visibility.Collapsed;
+                    UI.DatagridForComments.Visibility = Visibility.Collapsed;
                 }
-                else
+                else if(protocol == NamingProtocol.NonIso)
                 {
                     UI.DatagridIso.Visibility = Visibility.Collapsed;
                     UI.DatagridNonIso.Visibility = Visibility.Visible;
                     UI.NoFileWarning.Visibility = Visibility.Collapsed;
+                    UI.DatagridForComments.Visibility = Visibility.Collapsed;
+
+                }
+                else
+                {
+                    UI.DatagridIso.Visibility = Visibility.Collapsed;
+                    UI.DatagridNonIso.Visibility = Visibility.Collapsed;
+                    UI.NoFileWarning.Visibility = Visibility.Collapsed;
+                    UI.DatagridForComments.Visibility = Visibility.Visible;
                 }
             });
         }
     }
 }
+
+/*/
+ * 
+    foreach (var file in selection)
+    {
+        file.Save(iso);
+    }
+
+    Logger.Info($"{selection.Count} files renamed, in path {Folder.Path}");
+
+    // TO DO : CHECK UNIQUENESS OF FILENAMES
+    // TO DO : IMPLEMENT SAVE
+    // something 
+    MessageBox.Show("disabled for testing");
+/*/
