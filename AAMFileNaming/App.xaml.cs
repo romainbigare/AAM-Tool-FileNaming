@@ -3,6 +3,7 @@ using NLog;
 using System;
 using System.Globalization;
 using System.Windows;
+using System.Threading.Tasks;
 
 namespace AAMFileNaming
 {
@@ -13,7 +14,7 @@ namespace AAMFileNaming
     {
         private CoreAssemblyLoader loader = new CoreAssemblyLoader();
 
-        private void Application_Startup(object sender, StartupEventArgs e)
+        private async void Application_Startup(object sender, StartupEventArgs e)
         {
             string folderPath = null;
             var updateTimeStamp = $"{AppDomain.CurrentDomain.BaseDirectory}LastUpdated.txt";
@@ -22,41 +23,9 @@ namespace AAMFileNaming
             // subscribe to app closing
             this.Exit += (s, ex) =>
             {
-                try
-                {
-                    // write simple text file in current app folder with timestamp
-                    var timestamp = DateTime.Now.ToString(format);
-                    System.IO.File.WriteAllText(updateTimeStamp, timestamp);
-                }
-                catch (Exception excep)
-                {
-                    AAMLogger.Error(excep, "Error saving time stamp");
-                }
-
                 AAMLogger.Info("App closing");
-            }; 
+            };
 
-            try
-            {
-                string? lastUpdate = null;
-                // check last time the app was opened
-                if (System.IO.File.Exists(updateTimeStamp))
-                {
-                    lastUpdate = System.IO.File.ReadAllText(updateTimeStamp);
-                    AAMLogger.Info($"Last update: {lastUpdate}");
-                }
-
-                // if last update is never or more than 1 day ago, check for updates
-                if (lastUpdate == null || DateTime.Now.Subtract(DateTime.ParseExact(lastUpdate, format, CultureInfo.InvariantCulture)).TotalDays > 1)
-                {
-                    var result = AutoUpdater.Update();
-                    AAMLogger.Info($"Updater result : {result}");
-                }
-            }
-            catch (Exception excep)
-            {
-                AAMLogger.Error(excep, "Error while updating the app");
-            }
 
             AppDomain.CurrentDomain.UnhandledException += (s, ex) =>
             {
@@ -69,10 +38,23 @@ namespace AAMFileNaming
             }
 
             // show window
-            LoadWindow(folderPath);
+            await LoadWindow(folderPath);
+
+            try
+            {
+                Task.Run(() =>
+                {
+                    var result = AutoUpdater.Update();
+                    AAMLogger.Info(result);
+                });
+            }
+            catch (Exception excep)
+            {
+                AAMLogger.Error(excep, "Error while updating the app");
+            }
         }
 
-        private void LoadWindow(string folderPath)
+        private async Task LoadWindow(string folderPath)
         {
             try
             {

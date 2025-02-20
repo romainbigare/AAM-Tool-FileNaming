@@ -9,7 +9,7 @@
         Height="750" 
         Width="450"
         Background="#efefef"
-        Title="Input"  >
+        Title="{Binding WindowTitle}"  >
 
     <!-- WHERE DO I ADD MY CUSTOM STYLES IN THIS WINDOW-->
     <Window.Resources>
@@ -35,9 +35,9 @@
 
         <TreeView Name="Treeview" Margin="20,0"  VerticalAlignment="Stretch" Grid.Row="1" />
 
-        <hc:TextBox Name="ManualValue" Margin="20,5"  VerticalAlignment="Stretch" Grid.Row="3" hc:InfoElement.Placeholder="Manual override" />
+        <hc:TextBox Name="ManualValue" Margin="20,5"  VerticalAlignment="Stretch" Grid.Row="3" hc:InfoElement.Placeholder="Manual Input" />
 
-        <TextBlock Text="Notes " HorizontalAlignment="Left" FontWeight="SemiBold" Margin="20,20,20,5" Grid.Row="4"/>
+        <TextBlock Text="How to Use " HorizontalAlignment="Left" FontWeight="SemiBold" Margin="20,20,20,5" Grid.Row="4"/>
         
         <hc:ScrollViewer Grid.Row="5" Margin="20,0,20,20">
             <TextBlock Name='InfoBox' Foreground="Gray" Text="Notes on usage for this input blablablala. We should do a very long text." TextWrapping="Wrap" HorizontalAlignment="Stretch" VerticalAlignment="Top" />
@@ -50,7 +50,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Button Width="100" Name="btnCancel" Content="Cancel" Margin="20,0" Grid.Column="0" Click="btnCancel_Click" />
-            <Button Width="100" Name="btnOk" Content="Ok" Margin="20,0" Grid.Column="1" Click="btnOk_Click"  Style="{StaticResource ButtonPrimary}"/>
+            <Button Width="100" Name="btnOk" Content="OK" Margin="20,0" Grid.Column="1" Click="btnOk_Click"  Style="{StaticResource ButtonPrimary}"/>
         </Grid>
     </Grid>
 </Window>

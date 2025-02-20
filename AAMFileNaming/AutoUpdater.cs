@@ -46,7 +46,12 @@ namespace AAMFileNaming
                         {
                             try
                             {
-                                File.Copy(server_file_path, local_file.FullName, true);
+                                // rename old file
+                                string old_file_path = local_file.FullName + "-old";
+                                File.Move(local_file.FullName, old_file_path, true);
+                                AAMLogger.Info($"RENAAME : renamed old file {old_file_path}");
+                                // copy new file
+                                File.Copy(server_file_path, local_file.FullName, false);
                                 AAMLogger.Info($"RENAAME : updated file {local_file.Name}");
                             }
                             catch (Exception ex)

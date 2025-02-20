@@ -911,55 +911,9 @@ namespace AAMFileNamingCore.DataModel
                 return DocumentTypeIso.Schedule;
             else if (Path.Contains("specifications", StringComparison.OrdinalIgnoreCase))
                 return DocumentTypeIso.Specification;
-            else if (Path.Contains("animations", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Animation;
-            else if (Path.Contains("architect instructions", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.ArchitectsInstruction;
-            else if (Path.Contains("appointments", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Appointment;
-            else if (Path.Contains("bids", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Bid;
-            else if (Path.Contains("briefs", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Brief;
-            else if (Path.Contains("correspondence", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Correspondence;
-            else if (Path.Contains("certificates", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Certificate;
-            else if (Path.Contains("document issues", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.DocumentIssue;
-            else if (Path.Contains("documents", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Document;
-            else if (Path.Contains("file notes", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.FileNotes;
-            else if (Path.Contains("health and safety", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.HealthAndSafety;
-            else if (Path.Contains("information exchange", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.InformationExchange;
             else if (Path.Contains("3d models", StringComparison.OrdinalIgnoreCase))
                 return DocumentTypeIso.Model3D;
-            else if (Path.Contains("minutes", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Minutes;
-            else if (Path.Contains("project directories", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.ProjectDirectory;
-            else if (Path.Contains("programmes", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Programme;
-            else if (Path.Contains("photos", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Photo;
-            else if (Path.Contains("presentations", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Presentation;
-            else if (Path.Contains("room data sheets", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.RoomDataSheet;
-            else if (Path.Contains("requests for information", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.RequestForInformation;
-            else if (Path.Contains("responsibility matrices", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.ResponsibilityMatrix;
-            else if (Path.Contains("reports", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Report;
-            else if (Path.Contains("trackers", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Tracker;
-            else if (Path.Contains("visualisations", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Visualisation;
-
+            
             if (extension.Equals(".dwg", StringComparison.OrdinalIgnoreCase))
                 return DocumentTypeIso.Drawing;
             else if (extension.Equals(".skp", StringComparison.OrdinalIgnoreCase))
@@ -978,42 +932,15 @@ namespace AAMFileNamingCore.DataModel
                 return DocumentTypeIso.Schedule;
             else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
                 return DocumentTypeIso.Specification;
-            else if (extension.Equals(".avi", StringComparison.OrdinalIgnoreCase) || extension.Equals(".mp4", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Animation;
             else if (extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                 return DocumentTypeIso.Drawing;
-            else if (extension.Equals(".ics", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Appointment;
-            else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Brief;
-            else if (extension.Equals(".msg", StringComparison.OrdinalIgnoreCase) || extension.Equals(".eml", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Correspondence;
-            else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Document;
-            else if (extension.Equals(".txt", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.FileNotes;
             else if (extension.Equals(".fbx", StringComparison.OrdinalIgnoreCase) || extension.Equals(".obj", StringComparison.OrdinalIgnoreCase))
                 return DocumentTypeIso.Model3D;
-            else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Minutes;
             else if (extension.Equals(".pdf", StringComparison.OrdinalIgnoreCase))
                 return DocumentTypeIso.Drawing;
-            else if (extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) || extension.Equals(".png", StringComparison.OrdinalIgnoreCase) || extension.Equals(".psd", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Photo;
-            else if (extension.Equals(".ppt", StringComparison.OrdinalIgnoreCase) || extension.Equals(".pptx", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Presentation;
-            else if (extension.Equals(".doc", StringComparison.OrdinalIgnoreCase) || extension.Equals(".docx", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Report;
-            else if (extension.Equals(".indd", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Report;
-
-            else if (extension.Equals(".xls", StringComparison.OrdinalIgnoreCase) || extension.Equals(".xlsx", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Tracker;
-            else if (extension.Equals(".jpg", StringComparison.OrdinalIgnoreCase) || extension.Equals(".png", StringComparison.OrdinalIgnoreCase))
-                return DocumentTypeIso.Visualisation;
-
             // If none of the conditions matched, return None
-            return DocumentTypeIso.Document;
+
+            return DocumentTypeIso.Drawing;
         }
 
         public static async Task<string> GuessProjectNumber(string path)

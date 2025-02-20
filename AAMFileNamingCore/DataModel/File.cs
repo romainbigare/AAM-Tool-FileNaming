@@ -40,7 +40,7 @@ namespace AAMFileNamingCore.DataModel
         public string Extension => System.IO.Path.GetExtension(Path);
         public string NewNameIso => $"{ProjectNumber}-{Originator}-{Volume}-{LevelString}-{DocumentTypeIsoString}-{RoleString}-{TypeCodeString}{DrawingSerialNo}{CreateSeparator(Description, "_")}{Description}";
         public string NewNameNonIso => $"{ProjectNumber}_{FileCodeString}{CreateSeparator(DocumentTypeString, "_")}{DocumentTypeString}_{DateOfIssue}{CreateSeparator(Revision, "_")}{Revision}{CreateSeparator(Description, "_")}{Description}";
-        public string NewNameForComments => Name.ToLower().Contains("comment") ? Name : $"{Name}_{User}ForComments_{DateOfIssue}";
+        public string NewNameForComments => Name.ToLower().Contains("comment") ? Name : $"{Name}_{User}Comments_{DateOfIssue}";
         public string NewNameRootIso => $"{ProjectNumber}-{Originator}-{Volume}-{LevelString}-{DocumentTypeIsoString}-{RoleString}-{TypeCodeString}-{Description}";
         public string NewNameRootNonIso => $"{ProjectNumber}_{FileCodeString}_{DocumentTypeIsoString}_{DateOfIssue}_{Revision}_{Description}";
         public string NewNameRootForComments => $"{Name}_{User}ForComments_{DateOfIssue}";

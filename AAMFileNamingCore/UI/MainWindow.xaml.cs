@@ -2,6 +2,8 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Diagnostics;
+using System.Windows.Navigation;
 using AAMFileNamingCore.DataModel;
 using AAMFileNamingCore.Util;
 
@@ -185,6 +187,25 @@ namespace AAMFileNamingCore.UI
                 return;
 
             var input = tag.ToString();
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+        {
+            try
+            {
+                var website = e.Uri;
+                if (website == null) return;
+                var url = website.AbsoluteUri;
+                if (url == null) return;
+
+                Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+                e.Handled = true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+            
         }
     }
 }

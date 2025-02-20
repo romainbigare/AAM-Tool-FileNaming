@@ -205,7 +205,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:AAMFileNamingInstaller"
         "ProductCode" = "8:{48CCB679-47FD-40E4-BAD1-FB7F23182052}"
-        "PackageCode" = "8:{F2CB0FD6-B6A3-493A-BD9C-4E50B7509D26}"
+        "PackageCode" = "8:{4DE55A3F-8B12-4022-AFD1-A2B02CCCD088}"
         "UpgradeCode" = "8:{4B1FB871-757B-4D16-B480-19C165DA2264}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
@@ -371,7 +371,7 @@
                                             "Condition" = "8:"
                                             "Transitive" = "11:FALSE"
                                             "ValueTypes" = "3:1"
-                                            "Value" = "8:AAM rename file"
+                                            "Value" = "8:AAM File Renamer"
                                             }
                                             "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_FD17F87FD1064DFB8AB58AAF44544575"
                                             {
@@ -467,7 +467,7 @@
                                             "Condition" = "8:"
                                             "Transitive" = "11:FALSE"
                                             "ValueTypes" = "3:1"
-                                            "Value" = "8:AAM rename content"
+                                            "Value" = "8:AAM File Renamer"
                                             }
                                         }
                                     }
@@ -534,7 +534,7 @@
                                                     "Condition" = "8:"
                                                     "Transitive" = "11:FALSE"
                                                     "ValueTypes" = "3:1"
-                                                    "Value" = "8:AAM rename content"
+                                                    "Value" = "8:AAM File Renamer"
                                                     }
                                                     "{ADCFDA98-8FDD-45E4-90BC-E3D20B029870}:_537CFC759870470996080CE609E0E95A"
                                                     {

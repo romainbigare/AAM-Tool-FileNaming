@@ -40,7 +40,7 @@
                 <RowDefinition Height="Auto"/> <!-- 1 -->
                 <RowDefinition Height="Auto"/> <!-- 2 -->
                 <RowDefinition Height="Auto"/> <!-- 3 -->
-                <RowDefinition Height="*"/> <!-- 4 -->
+                <RowDefinition Height="Auto"/> <!-- 4 -->
                 <RowDefinition Height="Auto"/> <!-- 5 -->
                 <RowDefinition Height="Auto"/> <!-- 6 -->
                 <RowDefinition Height="Auto"/> <!-- 7 -->
@@ -71,9 +71,9 @@
             <!--TextBlock Text="{Binding Controller.Folder.Count}" 
                     Margin="20,5,20,10" Grid.Row="4" VerticalAlignment="Center" /-->
 
-            <TextBlock Text="Naming System" FontWeight="SemiBold" Margin="20, 80, 20, 0" Grid.Row="5" />
-            <TextBlock TextWrapping="Wrap"  Margin="20,5" Grid.Row="7" Foreground="Gray">
-                All project files intended for upload to a Common Data Environment (CDE) must be named to follow <Bold>BS EN ISO 19650</Bold>. This includes all drawings and specifications at a minimum. <LineBreak></LineBreak><LineBreak></LineBreak>For <Bold>Other Documents</Bold> that do not need to be named following ISO 19650, a shorter convention should be used.
+            <TextBlock Text="Naming System" FontWeight="SemiBold" Margin="20, 20, 20, 0" Grid.Row="5" />
+            <TextBlock TextWrapping="Wrap"  Margin="19,5" Grid.Row="7" Foreground="Gray">
+                All project files intended for upload to a Common Data Environment (CDE) must be named to follow <Bold>BS EN ISO 19650</Bold>. This includes all drawings and specifications at a minimum. <LineBreak></LineBreak><LineBreak></LineBreak>For <Bold>Other Documents</Bold> that do not need to be named following ISO 19650, a shorter convention should be used.<LineBreak/><LineBreak/>Please select the <Bold>For Comments</Bold> protocol for renaming files containing comments and mark-ups. Those documents should be moved into the project ADMIN folder under a relevant file code, and not stored in IMPORT.<LineBreak/><LineBreak/>This File Naming Assistant should be used with reference to the <Hyperlink RequestNavigate="Hyperlink_RequestNavigate" NavigateUri="https://sites.google.com/alliesandmorrison.com/hub-knowledge/document-protocols/project-folder-protocols">Project Folder Protocols</Hyperlink> 
 
             </TextBlock>
             <hc:ComboBox Name="NamingProtocol" Style="{StaticResource ComboBox.Small}" Margin="20,10"   Height="30"
@@ -138,15 +138,15 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn Width="*" Header="Current Name" Binding="{Binding Name, Mode=OneWay}" />
 
-                    <DataGridTemplateColumn Width=".8*" Header="Project No">
+                    <DataGridTemplateColumn Width=".8*" Header="Project No.">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding ProjectNumber, Mode=OneWay}" Tag="ProjectNumber" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"  HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox TextAlignment="Center" ToolTipService.InitialShowDelay="10" Text="{Binding ProjectNumber, Mode=OneWay}" Tag="ProjectNumber" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"  HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="Note" FontWeight="SemiBold" />
-                                            <TextBlock TextWrapping="Wrap" Text="Ask your client whether they have a preferred project abbreviation for this field."/>
-                                            <TextBlock TextWrapping="Wrap"  Text="Otherwise use the AAM project number, written using the format 999_01 - if there is a sub-job number."/>
+                                        <StackPanel HorizontalAlignment="Left" MaxWidth="300">
+                                            <TextBlock Text="How to Use" FontWeight="SemiBold" HorizontalAlignment="Left" />
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ask your client whether they have a preferred project abbreviation for this field."/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="Otherwise use the AAM project number, written using the format 999_01 - if there is a sub-job number."/>
                                         </StackPanel>
                                     </hc:TextBox.ToolTip>
                                 </hc:TextBox>
@@ -168,15 +168,18 @@
                             <DataTemplate>
                                 <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding Volume, Mode=OneWay}" Tag="Volume" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}">
                                     <hc:TextBox.ToolTip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="Note" FontWeight="SemiBold" />
-                                            <TextBlock TextWrapping="Wrap" Text="A list of codes should be developed by the project team, unless specified by the client. The codes can be 1-2 numbers, letters, or both. eg:"/>
-                                            <TextBlock TextWrapping="Wrap"  Text="A = Block A"/>
-                                            <TextBlock TextWrapping="Wrap"  Text="B = Block B"/>
-                                            <TextBlock TextWrapping="Wrap"  Text="00 = Shared Basement"/>
-                                            <TextBlock TextWrapping="Wrap"  Text="01 = Building A"/>
-                                            <TextBlock TextWrapping="Wrap"  Text="02 = Building B"/>
-                                            <TextBlock TextWrapping="Wrap"  Text="ZZ = Site-wide drawings."/>
+                                        <StackPanel MaxWidth="300"  HorizontalAlignment="Left">
+                                            <TextBlock  HorizontalAlignment="Left" Text="How to Use" FontWeight="SemiBold" />
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap" Text="A list of codes should be developed by the project team, unless specified by the client. The codes can be 1-2 numbers, letters, or both. eg:"/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text=" "/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="A = Block A"/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="B = Block B"/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="00 = Shared Basement"/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="01 = Building A"/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="02 = Building B"/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text=" "/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="XX = No specific volume relevant"/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="ZZ = Site-wide drawings and models"/>
                                         </StackPanel>
                                     </hc:TextBox.ToolTip>
                                 </hc:TextBox>
@@ -208,7 +211,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width=".7*" Header="TypeCode">
+                    <DataGridTemplateColumn Width=".7*" Header="Type Code">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button IsEnabled="{Binding DocumentTypeIsoString, Converter={StaticResource TypeCodeEnabledConverter}}" Content="{Binding TypeCodeString, Mode=OneWay}" Cursor="Hand" Tag="TypeCode" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}"  Click="GridButton_Click"  />
@@ -218,7 +221,7 @@
 
                     <DataGridTemplateColumn Width=".9*">
                         <DataGridTemplateColumn.Header>
-                            <TextBlock Text="Serial No" />
+                            <TextBlock Text="Serial No." />
 
                             <!--Button Content="⚡ Serial No" Cursor="Hand" Tag="DrawingSerialNo" ToolTip="Ensure uniqueness" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}" Click="UniquenessButton_Click" /-->
                         </DataGridTemplateColumn.Header>
@@ -227,11 +230,10 @@
                             <DataTemplate>
                                 <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding DrawingSerialNo, Mode=OneWay}" Tag="DrawingSerialNo" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" HorizontalContentAlignment="Center" HorizontalAlignment="Stretch"  >
                                     <hc:TextBox.ToolTip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="Note" FontWeight="SemiBold" />
-                                            <TextBlock TextWrapping="Wrap" Text="Serial numbers start from 001 within each drawing, schedule or specification type."/>
-                                            <TextBlock TextWrapping="Wrap"  Text="For drawings, serial numbers are best used to indicate the drawing scale."/>
-                                            <TextBlock TextWrapping="Wrap"  Text="Sketch drawings should not have type codes, and should be numbered sequentially, starting from 001"/>
+                                        <StackPanel  HorizontalAlignment="Left" MaxWidth="300">
+                                            <TextBlock  HorizontalAlignment="Left" Text="How to Use" FontWeight="SemiBold" />
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap" Text="For drawings (except sketches), the serial number reflects the drawing scale and level (for plans)."/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="Models, specifications, schedules and other documents should be numbered sequentially, starting from 001."/>
                                         </StackPanel>
                                     </hc:TextBox.ToolTip>
                                 </hc:TextBox>
@@ -245,9 +247,9 @@
                             <DataTemplate>
                                 <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding Description, Mode=OneWay}" Tag="Description" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus"  Height="20" Style="{StaticResource TextBox.Small}" HorizontalAlignment="Stretch" >
                                     <hc:TextBox.ToolTip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="Note" FontWeight="SemiBold" />
-                                            <TextBlock TextWrapping="Wrap" Text="Add a short description here if needed (eg Scoping Plan). Try to rely on the other fields and avoid adding a description where possible."/>
+                                        <StackPanel  HorizontalAlignment="Left" MaxWidth="300">
+                                            <TextBlock  HorizontalAlignment="Left" Text="How to Use" FontWeight="SemiBold" />
+                                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Add a short description here if needed (eg Scoping Plan). Try to rely on the other fields and avoid adding a description where possible."/>
                                         </StackPanel>
                                     </hc:TextBox.ToolTip>
                                 </hc:TextBox>
@@ -294,15 +296,15 @@
                     </DataGridTextColumn>
                     <DataGridTextColumn Width="*" Header="Current Name" Binding="{Binding Name, Mode=OneWay}" />
 
-                    <DataGridTemplateColumn Width=".8*" Header="Project No">
+                    <DataGridTemplateColumn Width=".8*" Header="Project No.">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding ProjectNumber, Mode=OneWay}"  Tag="ProjectNumber" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox TextAlignment="Center" ToolTipService.InitialShowDelay="10" Text="{Binding ProjectNumber, Mode=OneWay}"  Tag="ProjectNumber" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" HorizontalAlignment="Stretch" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="Note" FontWeight="SemiBold" />
-                                            <TextBlock TextWrapping="Wrap" Text="Ask your client whether they have a preferred project abbreviation for this field."/>
-                                            <TextBlock TextWrapping="Wrap"  Text="Otherwise use the AAM project number, written using the format 999_01 - if there is a sub-job number."/>
+                                        <StackPanel  HorizontalAlignment="Left" MaxWidth="300">
+                                            <TextBlock  HorizontalAlignment="Left" Text="How to Use" FontWeight="SemiBold" />
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap" Text="Ask your client whether they have a preferred project abbreviation for this field."/>
+                                            <TextBlock  HorizontalAlignment="Left" TextWrapping="Wrap"  Text="Otherwise use the AAM project number, written using the format 999_01 - if there is a sub-job number."/>
                                         </StackPanel>
                                     </hc:TextBox.ToolTip>
                                 </hc:TextBox>
@@ -311,7 +313,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width=".7*" Header="Code">
+                    <DataGridTemplateColumn Width=".7*" Header="Filecode">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Content="{Binding FileCodeString, Mode=OneWay}" Cursor="Hand"  Tag="FileCode" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}"  Click="GridButton_Click"  />
@@ -319,7 +321,7 @@
                         </DataGridTemplateColumn.CellTemplate>
                     </DataGridTemplateColumn>
 
-                    <DataGridTemplateColumn Width=".7*" Header="Type">
+                    <DataGridTemplateColumn Width=".7*" Header="Common Files">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <Button Content="{Binding DocumentTypeString, Mode=OneWay}" Cursor="Hand"  Tag="DocumentType" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}"  Click="GridButton_Click"  />
@@ -330,11 +332,11 @@
                     <DataGridTemplateColumn Width=".7*" Header="Date">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding DateOfIssue, Mode=OneWay}"  Tag="DateOfIssue" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox TextAlignment="Center"  ToolTipService.InitialShowDelay="10" Text="{Binding DateOfIssue, Mode=OneWay}"  Tag="DateOfIssue" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="Note" FontWeight="SemiBold" />
-                                            <TextBlock TextWrapping="Wrap" Text="Serial numbers start from 001 within each drawing, schedule or specification type."/>
+                                        <StackPanel  HorizontalAlignment="Left" MaxWidth="300">
+                                            <TextBlock  HorizontalAlignment="Left" Text="How to Use" FontWeight="SemiBold" />
+                                            <TextBlock  HorizontalAlignment="Left"  TextWrapping="Wrap" Text="All documents issued externally should include a date written in YYMMDD format, representing the issue date."/>
                                         </StackPanel>
                                     </hc:TextBox.ToolTip>
                                 </hc:TextBox>
@@ -345,11 +347,11 @@
                     <DataGridTemplateColumn Width=".7*" Header="Revision (optional)">
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
-                                <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding Revision, Mode=OneWay}"  Tag="Revision" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
+                                <hc:TextBox TextAlignment="Center"  ToolTipService.InitialShowDelay="10" Text="{Binding Revision, Mode=OneWay}"  Tag="Revision" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="Note" FontWeight="SemiBold" />
-                                            <TextBlock TextWrapping="Wrap" Text="A revision may be added if the document is issued externally. Usually starts with P (P01, P02, etc)"/>
+                                        <StackPanel HorizontalAlignment="Left" MaxWidth="300">
+                                            <TextBlock HorizontalAlignment="Left" Text="How to Use" FontWeight="SemiBold" />
+                                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="For documents issued in numbered revisions. Use the convention P01, P02, P03, etc."/>
                                         </StackPanel>
                                     </hc:TextBox.ToolTip>
                                 </hc:TextBox>
@@ -359,16 +361,16 @@
 
                     <DataGridTemplateColumn Width="1.2*">
                         <DataGridTemplateColumn.Header>
-                            <TextBlock Text="Description" />
+                            <TextBlock Text="Description (optional)" />
                             <!--Button Content="⚡ Description (optional)" Tag="Description"  Cursor="Hand" ToolTip="Ensure uniqueness" HorizontalAlignment="Stretch" Style="{StaticResource ButtonDefault.Small}" Click="UniquenessButton_Click" /-->
                         </DataGridTemplateColumn.Header>
                         <DataGridTemplateColumn.CellTemplate>
                             <DataTemplate>
                                 <hc:TextBox  ToolTipService.InitialShowDelay="10" Text="{Binding Description, Mode=OneWay}"  Tag="Description" LostFocus="TextBox_LostFocus" GotFocus="TextBox_GotFocus" Height="20" Style="{StaticResource TextBox.Small}" >
                                     <hc:TextBox.ToolTip>
-                                        <StackPanel MaxWidth="300">
-                                            <TextBlock Text="Note" FontWeight="SemiBold" />
-                                            <TextBlock TextWrapping="Wrap" Text="Add a short description here if needed (eg Scoping Plan). Try to rely on the other fields and avoid adding a description where possible."/>
+                                        <StackPanel HorizontalAlignment="Left" MaxWidth="300">
+                                            <TextBlock HorizontalAlignment="Left" Text="How to Use" FontWeight="SemiBold" />
+                                            <TextBlock HorizontalAlignment="Left" TextWrapping="Wrap" Text="Add a short additional description of the file, if needed for identification. You do not need to repeat information already captured in the file code."/>
                                         </StackPanel>
                                     </hc:TextBox.ToolTip>
                                 </hc:TextBox>

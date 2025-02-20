@@ -14,12 +14,12 @@ namespace AAMFileNamingCore.UI
     /// </summary>
     public partial class DataInput : Window
     {
-
         public Type inputType { get; set; }
         public bool SaveResult { get; set; } = false;
         public object SelectedItem { get; set; } = null;
         public bool manualOverride { get; private set; } = false;
         public Controller Controller { get; set; }
+        public string? WindowTitle => inputType?.Name;
 
         public DataInput()
         {
@@ -58,12 +58,21 @@ The level code in file names should generally match the levels as shown on drawi
                 return @"Use 'DR' for all drawings except Sketches (where 'SK' should be used).";
 
             if(input == typeof(DocumentType))
-                return @"Most commonly left empty.";
+                return @"For letters, agendas, minutes and publicity, a short abbreviation can be used. For other documents leave this field blank.";
 
             if (input == typeof(TypeCode))
                 return @"The type code system is derived from the CI/SfB Construction Indexing classification system (also used in Microstation level menu and in AAM library).
-
-For Sketch (SK) drawings, the type code should be 00.";
+A type code should be used for all drawings (except sketches), schedules and specifications. 
+Other documents including sketches should use the type code 00.
+";
+            if (input == typeof(FileCode))
+                return @"File codes represent the topic of the document and come from a pre-defined list.
+Working files created in GRAPHICS should use either R (Report) or P (Presentation).
+Working files created in ADMIN must contain a file code matching the folder they are created in.
+Sketches (SK) should be saved in the project’s WIP folder.
+Publicity (PR) files should be saved in the project’s WORK/PR folder.
+See the project folder protocols for a visual explanation.
+";
 
 
             return "";
