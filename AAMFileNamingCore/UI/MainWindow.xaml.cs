@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.Windows.Navigation;
 using AAMFileNamingCore.DataModel;
 using AAMFileNamingCore.Util;
+using AAMFileNaming.Shared.Logging;
 
 namespace AAMFileNamingCore.UI
 {
@@ -24,6 +25,7 @@ namespace AAMFileNamingCore.UI
             Controller = new Controller(this, folderPath);
             DataContext = this;
             ToolTipService.SetInitialShowDelay(this, 20); // Adjust as needed
+            AAMLogger.Info("Window opened v0.9");
         }
 
         private void BrowseFolderButton_Click(object sender, RoutedEventArgs e)

@@ -4,6 +4,7 @@ using System;
 using System.Globalization;
 using System.Windows;
 using System.Threading.Tasks;
+using System.Diagnostics;
 
 namespace AAMFileNaming
 {
@@ -16,9 +17,11 @@ namespace AAMFileNaming
 
         private async void Application_Startup(object sender, StartupEventArgs e)
         {
+            AAMLogger.Info("App opening");
+            // we will track execution time of all these steps here.
+
             string folderPath = null;
             var updateTimeStamp = $"{AppDomain.CurrentDomain.BaseDirectory}LastUpdated.txt";
-            string format = "yyyy-MM-dd_HH-mm-ss";
 
             // subscribe to app closing
             this.Exit += (s, ex) =>
@@ -37,9 +40,10 @@ namespace AAMFileNaming
                 folderPath = e.Args[0];
             }
 
+
             // show window
             await LoadWindow(folderPath);
-
+         
             try
             {
                 Task.Run(() =>
@@ -52,6 +56,7 @@ namespace AAMFileNaming
             {
                 AAMLogger.Error(excep, "Error while updating the app");
             }
+
         }
 
         private async Task LoadWindow(string folderPath)
